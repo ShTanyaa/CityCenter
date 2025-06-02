@@ -1,0 +1,149 @@
+﻿@page "/shops"
+@using CityCenter.Data
+@using CityCenter.Models
+@using Microsoft.EntityFrameworkCore
+
+@inject AppDbContext Db
+
+<style>
+    .shops-screen {
+        padding: 60px 30px;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #0a0a0a, #111);
+        color: white;
+    }
+
+    .shops-title {
+        font-size: 3rem;
+        text-align: center;
+        margin-bottom: 40px;
+        color: #00aaff;
+        text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
+    }
+
+    .shops-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 30px;
+        max-width: 1300px;
+        margin: 0 auto;
+    }
+
+    .shop-card {
+        background: linear-gradient(135deg, #1b1b1b, #2a2a2a);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.6);
+        transition: transform 0.3s ease;
+    }
+
+        .shop-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 20px #00aaff;
+        }
+
+        .shop-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .shop-card h3 {
+            margin: 0;
+            font-size: 1.4rem;
+            color: #fff;
+        }
+
+        .shop-card p {
+            margin: 5px 0;
+            color: #ccc;
+        }
+
+        .shop-card a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 16px;
+            background-color: #00aaff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+            .shop-card a:hover {
+                background-color: #0088cc;
+            }
+</style>
+
+<div class="shops-screen">
+    <h1 class="shops-title">Магазины и бутики</h1>
+
+    <div class="shops-grid">
+        @foreach (var room in RoomsWithLinks)
+        {
+            <div class="shop-card">
+                @if (!string.IsNullOrWhiteSpace(room.Фото))
+                {
+                    <img src="@room.Фото" alt="Фото магазина" />
+                }
+                else
+                {
+                    <div style="height: 160px; background: #444; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #aaa;">
+                        Фото отсутствует
+                    </div>
+                }
+                т
+                <h3>@room.Название</h3>
+                <p><strong>Этаж:</strong> @room.Этаж</p>
+
+                @if (!string.IsNullOrWhiteSpace(room.СсылкаНаМагазин))
+                {
+                    <a href="@GetFullUrl(room.СсылкаНаМагазин)" target="_blank">🌐 Перейти на сайт</a>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<ShopInfo> RoomsWithLinks = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        RoomsWithLinks = await Db.Помещенияs
+            .Where(p => !string.IsNullOrEmpty(p.СсылкаНаМагазин)
+                && p.IdНазначенияNavigation.Название != "Услуги"
+                && p.IdНазначенияNavigation.Название != "Кафе")
+            .Select(p => new ShopInfo
+                {
+                    Название = p.Название,
+                    Этаж = p.Этаж,
+                    Фото = p.Фото,
+                    СсылкаНаМагазин = p.СсылкаНаМагазин
+                })
+            .ToListAsync();
+    }
+
+
+    private string GetFullUrl(string? url)
+    {
+        url = url?.Trim();
+
+        if (string.IsNullOrWhiteSpace(url))
+            return "#";
+
+        return url.StartsWith("http", StringComparison.OrdinalIgnoreCase)
+            ? url
+            : $"https://{url}";
+    }
+
+    private class ShopInfo
+    {
+        public string Название { get; set; }
+        public int Этаж { get; set; }
+        public string Фото { get; set; }
+        public string? СсылкаНаМагазин { get; set; }
+    }
+}

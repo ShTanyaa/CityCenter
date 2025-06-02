@@ -1,0 +1,157 @@
+﻿@page "/edit-room/{id:int}"
+@using CityCenter.Data
+@using CityCenter.Models
+@inject NavigationManager NavigationManager
+@inject AppDbContext Db
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #0a0a0a, #111);
+        color: #fff;
+        margin: 0;
+        padding: 0;
+    }
+    .edit-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 60px 40px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    h2 {
+        font-size: 3rem;
+        margin-bottom: 30px;
+        color: #fff;
+        text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-control {
+        padding: 22px;
+        font-size: 1.3rem;
+        border-radius: 12px;
+        border: none;
+        margin-bottom: 20px;
+        width: 100%;
+        max-width: 600px;
+        background-color: #1e1e1e;
+        color: white;
+        transition: box-shadow 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        box-shadow: 0 0 10px #00aaff;
+    }
+
+    .btn {
+        padding: 18px 35px;
+        font-size: 1.4rem;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        background: #00aaff;
+        color: white;
+        margin-top: 20px;
+        transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .btn:hover {
+        background: #0088cc;
+        transform: scale(1.03);
+        box-shadow: 0 0 10px #00aaff;
+    }
+
+    .message {
+        margin-top: 20px;
+        font-size: 1.2rem;
+        color: #4caf50;
+    }
+</style>
+
+<div class="edit-screen">
+    <h2>Редактировать помещение</h2>
+
+   @if (room != null)
+{
+    <InputFile OnChange="HandleFileUpload" accept="image/*" />
+    @if (!string.IsNullOrEmpty(room.Фото))
+    {
+        <img src="@room.Фото" alt="Текущее фото" style="max-width: 300px; margin-top: 10px; border-radius: 10px;" />
+    }
+
+    <input class="form-control" @bind="room.Название" placeholder="Название" />
+    <input type="number" class="form-control" @bind="room.Этаж" placeholder="Этаж" />
+    <input type="number" class="form-control" @bind="room.Площадь" placeholder="Площадь (м²)" />
+    <textarea class="form-control" @bind="room.Описание" placeholder="Описание помещения"></textarea>
+
+    <select class="form-control" @bind="room.ДоступноДляАренды">
+        <option value="true">Доступно</option>
+        <option value="false">Занято</option>
+    </select>
+
+    <button class="btn" @onclick="SaveChanges">💾 Сохранить</button>
+        <button class="btn" style="background-color: gray; margin-left: 10px;" @onclick='() => NavigationManager.NavigateTo("/admin-dashboard")'>← Назад</button>
+
+    @if (!string.IsNullOrWhiteSpace(Message))
+    {
+        <div class="message">@Message</div>
+    }
+}
+else
+{
+    <p>Загрузка данных...</p>
+}
+
+</div>
+
+@code {
+   [Parameter] public int id { get; set; }
+[Inject] public IWebHostEnvironment Env { get; set; }
+
+private Помещения? room;
+private string? Message;
+private IBrowserFile? UploadedFile;
+
+protected override async Task OnInitializedAsync()
+{
+    room = await Db.Помещенияs.FindAsync(id);
+}
+
+private async Task SaveChanges()
+{
+    if (room != null)
+    {
+        if (UploadedFile != null)
+        {
+            room.Фото = await UploadImage(UploadedFile);
+        }
+
+        Db.Помещенияs.Update(room);
+        await Db.SaveChangesAsync();
+        Message = "✅ Изменения сохранены";
+    }
+}
+
+private async Task HandleFileUpload(InputFileChangeEventArgs e)
+{
+    UploadedFile = e.File;
+}
+
+private async Task<string> UploadImage(IBrowserFile file)
+{
+    var fileName = Path.GetRandomFileName() + Path.GetExtension(file.Name);
+    var folderPath = Path.Combine(Env.WebRootPath, "images");
+
+    if (!Directory.Exists(folderPath))
+        Directory.CreateDirectory(folderPath);
+
+    var filePath = Path.Combine(folderPath, fileName);
+    await using var stream = new FileStream(filePath, FileMode.Create);
+    await file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024).CopyToAsync(stream);
+
+    return "/images/" + fileName;
+}
+
+}

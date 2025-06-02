@@ -1,0 +1,234 @@
+﻿@page "/submit-payment/{roomId:int}/{userId:int}"
+@using CityCenter.Data
+@using CityCenter.Models
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext Db
+@inject NavigationManager NavigationManager
+@inject IWebHostEnvironment Env
+@inject AuthenticationStateProvider AuthProvider
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #0a0a0a, #111);
+        color: #fff;
+        margin: 0;
+        padding: 0;
+    }
+
+    .submit-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 60px 40px;
+    }
+
+    .card {
+        background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(40, 40, 40, 0.95));
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        max-width: 800px;
+        width: 100%;
+        margin-bottom: 30px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        font-size: 1.2rem;
+    }
+
+        .card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 30px #00aaff;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 14px;
+        font-size: 1rem;
+        border-radius: 10px;
+        border: none;
+        background-color: #1e1e1e;
+        color: white;
+        margin-top: 15px;
+        margin-bottom: 20px;
+    }
+
+        .form-control:focus {
+            outline: none;
+            box-shadow: 0 0 10px #00aaff;
+        }
+
+    .btn {
+        padding: 12px 24px;
+        font-size: 1.1rem;
+        border: none;
+        border-radius: 10px;
+        background-color: #00aaff;
+        color: white;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+        .btn:hover {
+            background-color: #0088cc;
+            transform: scale(1.03);
+        }
+
+    h2 {
+        font-size: 2.5rem;
+        margin-bottom: 30px;
+        text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.5);
+    }
+
+    .preview {
+        max-width: 300px;
+        border-radius: 10px;
+        margin-top: 15px;
+    }
+
+    .message {
+        color: lightgreen;
+        margin-top: 15px;
+        font-size: 1rem;
+    }
+</style>
+
+<div class="submit-container">
+    <h2>Оплата аренды</h2>
+
+    @if (room == null)
+    {
+        <p>Загрузка информации...</p>
+    }
+    else
+    {
+        <div class="card">
+            <p><strong>Название:</strong> @room.Название</p>
+            <p><strong>Этаж:</strong> @room.Этаж</p>
+            <p><strong>Площадь:</strong> @room.Площадь м²</p>
+            <p><strong>Стоимость аренды:</strong> @room.СтоимостьАренды.ToString("C")</p>
+        </div>
+
+        <div class="card">
+            <InputFile OnChange="HandleFileUpload" accept="image/*" />
+            @if (!string.IsNullOrEmpty(ImagePreview))
+            {
+                <img src="@ImagePreview" class="preview" />
+            }
+            <input class="form-control" placeholder="Цель аренды" @bind="Цель" required />
+            <input class="form-control" type="date" @bind="ДатаНачала" />
+            <input class="form-control" type="date" @bind="ДатаОкончания" />
+
+
+            <textarea class="form-control" rows="3" placeholder="Комментарий к оплате" @bind="Комментарий"></textarea>
+            <button class="btn" @onclick="SubmitApplication">📤 Отправить заявку</button>
+
+            @if (!string.IsNullOrEmpty(Message))
+            {
+                <p class="message">@Message</p>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int roomId { get; set; }
+    [Parameter] public int userId { get; set; }
+
+    private string? Цель;
+    private DateTime ДатаНачала = DateTime.Today;
+    private DateTime ДатаОкончания = DateTime.Today.AddMonths(1);
+
+    private Помещения? room;
+    private IBrowserFile? UploadedFile;
+    private string? ImagePreview;
+    private string? Комментарий;
+    private string? Message;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        room = await Db.Помещенияs.FindAsync(roomId);
+    }
+
+
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        UploadedFile = e.File;
+
+        using var stream = UploadedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+        var buffer = new byte[UploadedFile.Size];
+        await stream.ReadAsync(buffer);
+        ImagePreview = $"data:{UploadedFile.ContentType};base64,{Convert.ToBase64String(buffer)}";
+    }
+
+    private async Task SubmitApplication()
+    {
+        try
+        {
+            if (UploadedFile == null || userId == 0 || string.IsNullOrWhiteSpace(Цель))
+            {
+                Message = "❗ Заполните все поля и загрузите скрин оплаты.";
+                return;
+            }
+
+            // Сохраняем файл
+            var fileName = Guid.NewGuid() + Path.GetExtension(UploadedFile.Name);
+            var savePath = Path.Combine(Env.WebRootPath, "uploads", fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(savePath)!);
+
+            await using var fs = new FileStream(savePath, FileMode.Create);
+            await UploadedFile.OpenReadStream().CopyToAsync(fs);
+
+            // Находим арендатора
+            var арендатор = await Db.Арендаторыs.FirstOrDefaultAsync(a => a.IdПользователя == userId);
+            if (арендатор == null)
+            {
+                Message = $"❗ Ошибка: арендатор не найден.";
+                return;
+            }
+
+            // Сохраняем заявку
+            var заявка = new ЗаявкаНаАренду
+                {
+                    ID_Пользователя = userId,
+                    ID_Помещения = roomId,
+                    ДатаЗаявки = DateTime.Now,
+                    ФотоОплаты = "/uploads/" + fileName,
+                    Комментарий = Комментарий ?? "",
+                    Статус = "В обработке" // сразу принимается
+                };
+
+            Db.ЗаявкиНаАренду.Add(заявка);
+
+            // // Сохраняем аренду
+            // var аренда = new Аренда
+            //     {
+            //         IdАрендатора = арендатор.IdАрендатора,
+            //         IdПомещения = roomId,
+            //         Цель = Цель!,
+            //         ДатаНачала = ДатаНачала,
+            //         ДатаОкончания = ДатаОкончания,
+            //         ДатаПоследнегоИзменения = null
+            //     };
+
+            // Db.Арендаs.Add(аренда);
+
+            // Обновляем статус помещения
+            var помещение = await Db.Помещенияs.FindAsync(roomId);
+            if (помещение != null)
+                помещение.ДоступноДляАренды = false;
+
+            await Db.SaveChangesAsync();
+
+            Message = "✅ Заявка и аренда успешно оформлены!";
+        }
+        catch (Exception ex)
+        {
+            var inner = ex.InnerException?.Message ?? ex.Message;
+            Message = $"❗ Ошибка: {inner}";
+        }
+    }
+
+
+
+}

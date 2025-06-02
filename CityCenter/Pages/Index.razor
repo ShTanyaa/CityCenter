@@ -1,0 +1,88 @@
+﻿@page "/"
+@inject NavigationManager Navigation
+@using CityCenter.Data
+@inject AppDbContext Db
+
+
+<style>
+    .welcome-screen {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        padding: 40px;
+        text-align: center;
+        background: linear-gradient(135deg, #0a0a0a, #1e1e1e);
+    }
+
+    .welcome-title {
+        font-size: 3.5rem;
+        margin-bottom: 40px;
+        color: #00aaff;
+        text-shadow: 2px 2px 12px rgba(0,0,0,0.7);
+    }
+
+    .welcome-options {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 50px;
+    }
+
+    .option-card {
+        width: 400px;
+        padding: 40px 30px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 1), rgba(40, 40, 40, 0.6));
+        color: white;
+        font-size: 1.3rem;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.8);
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+        text-align: center;
+    }
+
+        .option-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px #00aaff;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 100, 150, 0.5));
+        }
+
+        .option-card h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .option-card p {
+            font-size: 1.1rem;
+            margin: 0;
+        }
+</style>
+
+<div class="welcome-screen">
+    <h1 class="welcome-title">Добро пожаловать в Сити Центр!</h1>
+
+    <div class="welcome-options">
+        <div class="option-card" @onclick="NavigateToBusiness">
+            <h2>Для арендаторов</h2>
+            <p>Арендуйте помещения, управляйте договорами и развивайте свой бизнес прямо в ТЦ!</p>
+        </div>
+        <div class="option-card" @onclick="NavigateToVisitors">
+            <h2>Для посетителей</h2>
+            <p>Узнайте, какие магазины вас ждут, где провести время и что нового в центре.</p>
+        </div>
+    </div>
+</div>
+
+@code {
+    private void NavigateToVisitors()
+    {
+        Navigation.NavigateTo("/visitors");
+    }
+
+    private void NavigateToBusiness()
+    {
+        Navigation.NavigateTo("/login");
+    }
+}

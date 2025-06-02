@@ -1,0 +1,303 @@
+﻿@page "/map-rent"
+@using CityCenter.Data
+@using CityCenter.Models
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext Db
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
+@using System.Text.RegularExpressions;
+
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #0a0a0a, #111);
+        color: #fff;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+
+    .map-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px 80px 20px;
+        box-sizing: border-box;
+        min-height: 100vh;
+    }
+
+    .map-title {
+        font-size: 3rem;
+        font-weight: bold;
+        margin-bottom: 30px;
+        text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.5);
+        color: #00aaff;
+        text-align: center;
+    }
+
+    .map-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        width: 100%;
+        margin-bottom: 40px;
+    }
+
+    .svg-container svg {
+        width: 100vw;
+        height: 80vh;
+    }
+
+
+
+    .room-info {
+        background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(40, 40, 40, 0.95));
+        padding: 50px;
+        border-radius: 25px;
+        box-shadow: 0 0 40px rgba(0, 170, 255, 0.6);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        font-size: 1.4rem;
+        color: #fff;
+        max-width: 900px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+        .room-info:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 50px #00aaff;
+        }
+
+        .room-info b {
+            color: #00ffcc;
+        }
+
+    .btn {
+        margin-top: 30px;
+        padding: 14px 26px;
+        background-color: #00aaff;
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+        .btn:hover {
+            background-color: #0088cc;
+        }
+
+    /* Выделение выбранного помещения */
+    svg .selected {
+        fill: #00ff88 !important;
+        stroke: #00cc77 !important;
+        filter: drop-shadow(0 0 10px #00ff88);
+    }
+
+    svg g[id^="Store-"]:hover {
+        cursor: pointer;
+        transform: scale(1.05);
+        transition: transform 0.2s ease;
+        filter: drop-shadow(0 0 6px #00aaff);
+    }
+
+        svg g[id^="Store-"]:hover rect {
+            fill: rgba(0, 170, 255, 0.3) !important;
+            stroke: #00aaff !important;
+            transition: all 0.3s ease;
+        }
+
+    .svg-disabled {
+        opacity: 0.25;
+        pointer-events: none;
+        cursor: not-allowed;
+        filter: grayscale(1);
+    }
+
+    svg g.svg-disabled:hover {
+        transform: none !important;
+        filter: none !important;
+        cursor: not-allowed !important;
+    }
+
+    svg [id^="Vector_"],
+    svg [id^="icon"],
+    svg .icon {
+        display: none !important;
+    }
+
+
+    .floor-selector {
+        font-size: 1.3rem;
+        padding: 10px 20px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        border: none;
+        background-color: #1e1e1e;
+        color: white;
+        box-shadow: 0 0 10px #00aaff;
+    }
+
+</style>
+
+
+
+<div class="map-screen">
+    <h2 class="map-title">Выберите помещение на карте</h2>
+    <select @onchange="OnFloorChanged" class="floor-selector">
+        <option value="1">1 этаж</option>
+        <option value="2">2 этаж</option>
+        <option value="3">3 этаж</option>
+        <option value="4">4 этаж</option>
+    </select>
+
+
+
+    <div class="map-wrapper">
+        @if (!string.IsNullOrWhiteSpace(SvgContent))
+        {
+            <div class="svg-container">
+                @((MarkupString)SvgContent)
+            </div>
+        }
+    </div>
+
+    @if (SelectedRoom != null)
+    {
+        <div class="room-info" @ref="RoomInfoRef">
+            <h3>Помещение @SelectedRoom.Название</h3>
+            <p><b>Этаж:</b> @SelectedRoom.Этаж</p>
+            <p><b>Площадь:</b> @SelectedRoom.Площадь м²</p>
+            <p><b>Стоимость аренды:</b> @SelectedRoom.СтоимостьАренды.ToString("C")</p>
+            <button class="btn" @onclick='() => GoToRoomDetails(SelectedRoom.IdПомещения)'>Арендовать</button>
+        </div>
+    }
+</div>
+
+
+
+@code {
+    private string SvgContent = "";
+    private Dictionary<string, Помещения> Доступные = new();
+    private Помещения? SelectedRoom;
+    private ElementReference RoomInfoRef;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSvgForFloor(SelectedFloor);
+    }
+
+    private static List<string> GetAllSvgRoomIds(string svg)
+    {
+        var matches = Regex.Matches(svg, "id=\"(Store-[\\w-]+)\"");
+        return matches.Select(m => m.Groups[1].Value).Distinct().ToList();
+    }
+
+
+    private int SelectedFloor = 1;
+
+    private async Task OnFloorChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e?.Value?.ToString(), out int floor))
+        {
+            SelectedFloor = floor;
+            await LoadSvgForFloor(SelectedFloor);
+            StateHasChanged(); // если нужно явно перерисовать
+        }
+    }
+
+   
+    private async Task LoadSvgForFloor(int floor)
+    {
+        string path = $"wwwroot/images/Frame{floor}.svg";
+        SvgContent = await File.ReadAllTextAsync(path);
+
+        var всеИзБд = await Db.Помещенияs.ToListAsync();
+        var доступные = всеИзБд.Where(p => p.ДоступноДляАренды && p.Этаж == floor).ToList();
+        Доступные = доступные.ToDictionary(p => p.Расположение, p => p);
+
+        var svgIds = GetAllSvgRoomIds(SvgContent);
+
+        foreach (var id in svgIds)
+        {
+            var помещение = всеИзБд.FirstOrDefault(p => p.Расположение == id);
+            if (помещение == null || помещение.ДоступноДляАренды == false)
+            {
+                SvgContent = SvgContent.Replace(
+                    $"id=\"{id}\"",
+                    $"id=\"{id}\" class=\"svg-disabled\""
+                );
+            }
+        }
+    }
+
+    [Parameter] public int UserId { get; set; }
+
+    private void GoToRoomDetails(int roomId)
+    {
+        NavigationManager.NavigateTo($"/room-details/{roomId}?userId={UserId}");
+    }
+    
+
+    [JSInvokable]
+    public async void SetSelectedRoom(string id)
+    {
+        Console.WriteLine("🧲 Room ID clicked: " + id);
+
+        if (Доступные.TryGetValue(id, out var room))
+        {
+            SelectedRoom = room;
+            StateHasChanged();
+
+            // await Task.Delay(100); // Ждём отрисовку
+            // await JS.InvokeVoidAsync("scrollToRoomInfo");
+        }
+    }
+
+
+    private DotNetObjectReference<SpaceInMap>? dotNetRef;
+
+    private string? _lastScrolledId;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("mapRent.setupClickHandler", dotNetRef);
+        }
+
+        // Прокрутка ТОЛЬКО если была выбрана новая комната
+        if (SelectedRoom != null && SelectedRoom.Расположение != _lastScrolledId)
+        {
+            _lastScrolledId = SelectedRoom.Расположение;
+            await JS.InvokeVoidAsync("scrollToRoomInfo");
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        dotNetRef?.Dispose();
+    }
+
+}
+<script>
+    function scrollToRoomInfo() {
+        const roomCard = document.querySelector('.room-info');
+        if (!roomCard) return;
+
+        const rect = roomCard.getBoundingClientRect();
+
+        // Только если карточка ниже экрана
+        const isBelowViewport = rect.top > window.innerHeight || rect.bottom > window.innerHeight;
+
+        if (isBelowViewport) {
+            roomCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+</script>
+
