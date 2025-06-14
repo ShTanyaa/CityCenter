@@ -91,25 +91,26 @@
             background-color: #0088cc;
         }
 
-    /* Выделение выбранного помещения */
+    /* Подсветка выбранного помещения */
     svg .selected {
         fill: #00ff88 !important;
         stroke: #00cc77 !important;
         filter: drop-shadow(0 0 10px #00ff88);
     }
 
+    /* Подсветка при наведении без сдвига и масштабирования */
     svg g[id^="Store-"]:hover {
         cursor: pointer;
-        transform: scale(1.05);
-        transition: transform 0.2s ease;
+        transition: filter 0.2s ease;
         filter: drop-shadow(0 0 6px #00aaff);
     }
 
         svg g[id^="Store-"]:hover rect {
-            fill: rgba(0, 170, 255, 0.3) !important;
+            fill: rgba(0, 170, 255, 0.15) !important;
             stroke: #00aaff !important;
             transition: all 0.3s ease;
         }
+
 
     .svg-disabled {
         opacity: 0.25;
@@ -235,11 +236,13 @@
         }
     }
 
-    [Parameter] public int UserId { get; set; }
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int userId { get; set; }
 
     private void GoToRoomDetails(int roomId)
     {
-        NavigationManager.NavigateTo($"/room-details/{roomId}?userId={UserId}");
+        NavigationManager.NavigateTo($"/room-details/{roomId}?userId={userId}");
     }
     
 
@@ -267,6 +270,7 @@
     {
         if (firstRender)
         {
+            dotNetRef?.Dispose();
             dotNetRef = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("mapRent.setupClickHandler", dotNetRef);
         }

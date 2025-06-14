@@ -7,6 +7,28 @@
 @inject AppDbContext Db
 
 <style>
+
+    .application-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 520px; /* или подбери нужное значение */
+    }
+
+    .card-content {
+        flex-grow: 1;
+    }
+
+    .delete-btn {
+        background-color: #777;
+        margin-top: auto;
+        margin-top: 20px;
+    }
+
+    button.btn::after {
+        margin-left: 8px;
+    }
+
     body {
         font-family: 'Poppins', sans-serif;
         background: linear-gradient(135deg, #0a0a0a, #111);
@@ -65,6 +87,10 @@
             box-shadow: 0 0 10px #00aaff;
         }
 
+    .btn-small {
+        padding: 20px 28px;
+        font-size: 1.3rem;
+    }
     .message {
         font-size: 1.2rem;
         margin-bottom: 20px;
@@ -165,9 +191,9 @@
                     <p>Площадь: @room.Площадь м²</p>
                     <p>Статус: @(room.ДоступноДляАренды ? "Доступно" : "Занято")</p>
 
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
-                        <button class="btn" @onclick="() => EditRoom(room.IdПомещения)">✏️ Редактировать</button>
-                        <button class="btn" style="background-color: #ff4c4c;" @onclick="() => DeleteRoom(room.IdПомещения)">🗑 Удалить</button>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                            <button class="btn btn-small" @onclick="() => EditRoom(room.IdПомещения)">✏️Редактировать</button>
+                            <button class="btn" style="background-color: #777;" @onclick="() => DeleteRoom(room.IdПомещения)">🗑 Удалить</button>
                     </div>
                 </div>
 
@@ -181,12 +207,41 @@
         <div class="grid">
             @foreach (var renter in Renters)
             {
-                <div class="card">
-                    <h4>@renter.Имя</h4>
-                    <p>Контакты: @renter.КонтактнаяИнформация</p>
-                    <p>Номер договора: @renter.НомерДоговора</p>
-                    <p>Статус: @renter.Статус</p>
-                </div>
+                    <div class="card">
+                        <h4>@renter.Имя</h4>
+                        <p>Контакты: @renter.КонтактнаяИнформация</p>
+                        <p>Номер договора: @renter.НомерДоговора</p>
+                        <p>Статус: @renter.Статус</p>
+
+                        <button class="btn" style="margin-top: 10px;" @onclick="() => ToggleRenter(renter.IdАрендатора)">
+                            @(ExpandedRenters.ContainsKey(renter.IdАрендатора) && ExpandedRenters[renter.IdАрендатора] ? "🔼 Скрыть помещения" : "🔽 Показать помещения")
+                        </button>
+
+                        @if (ExpandedRenters.ContainsKey(renter.IdАрендатора) && ExpandedRenters[renter.IdАрендатора])
+                        {
+                            var rooms = AllRents
+                            .Where(a => a.IdАрендатора == renter.IdАрендатора)
+                            .Select(a => a.IdПомещенияNavigation)
+                            .ToList();
+
+                            @if (rooms.Count > 0)
+                            {
+                                <ul style="margin-top: 10px;">
+                                    @foreach (var room in rooms)
+                                    {
+                                        <li style="margin: 5px 0;">
+                                            <b>@room.Название</b> — этаж @room.Этаж, @room.Площадь м²
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <p style="margin-top: 10px; color: #aaa;">Нет арендованных помещений.</p>
+                            }
+                        }
+                    </div>
+
             }
         </div>
     }
@@ -201,29 +256,99 @@
                 <div class="grid">
                     @foreach (var app in Applications)
                     {
-                        <div class="card">
-                            <h4>Заявка №@app.ID_Заявки</h4>
-                            <p>Пользователь: @UserNames.GetValueOrDefault(app.ID_Пользователя, "Неизвестный")</p>
-                            <p>Помещение: @RoomNames.GetValueOrDefault(app.ID_Помещения, "Удалено")</p>
-                            <p>Дата заявки: @app.ДатаЗаявки.ToShortDateString()</p>
-                            <p>Комментарий: @app.Комментарий</p>
-                            <p>Статус: @app.Статус</p>
+                        <div class="card application-card">
+                            <div class="card-content">
+                                <h4>Заявка №@app.ID_Заявки</h4>
+                                <p>Пользователь: @UserNames.GetValueOrDefault(app.ID_Пользователя, "Неизвестный")</p>
+                                <p>Помещение: @RoomNames.GetValueOrDefault(app.ID_Помещения, "Удалено")</p>
+                                <p>Дата заявки: @app.ДатаЗаявки.ToShortDateString()</p>
+                                <p>Комментарий: @app.Комментарий</p>
+                                <p>Статус: @app.Статус</p>
 
-                            @if (!string.IsNullOrWhiteSpace(app.ФотоОплаты))
-                            {
-                                <img src="@app.ФотоОплаты" alt="Скрин оплаты" style="max-width: 300px; margin-top: 10px; border-radius: 10px;" />
-                            }
+                                @if (!string.IsNullOrWhiteSpace(app.ФотоОплаты))
+                                {
+                                    <div style="position: relative;">
+                                        <!-- Маленькое превью -->
+                                        <img src="@app.ФотоОплаты"
+                                             alt="Скрин оплаты"
+                                             style="width: 100%;
+                                            max-height: 200px;
+                                            object-fit: contain;
+                                            margin-top: 10px;
+                                            border-radius: 10px;
+                                            cursor: pointer;"
+                                             @onclick="() => ShowFullImage(app.ФотоОплаты)" />
 
-                            @if (app.Статус == "В обработке")
+                                        <!-- Иконка лупы для наглядности -->
+                                        <div style="position: absolute;
+                                            top: 20px;
+                                            right: 20px;
+                                            background: rgba(0,0,0,0.7);
+                                            width: 30px;
+                                            height: 30px;
+                                            border-radius: 50%;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            pointer-events: none;">
+                                            🔍
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (app.Статус == "В обработке")
+                                {
+                                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+                                        <button class="btn" @onclick='() => UpdateStatus(app.ID_Заявки, "Принято")'>✅ Принять</button>
+                                        <button class="btn" style="background-color: #ff4c4c;" @onclick='() => UpdateStatus(app.ID_Заявки, "Отклонено")'>⛔ Отклонить</button>
+                                    </div>
+                                }
+                            </div>
+
+                            @if (app.Статус == "Принято" || app.Статус == "Отклонено")
                             {
-                                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
-                                    <button class="btn" @onclick='() => UpdateStatus(app.ID_Заявки, "Принято")'>✅ Принять</button>
-                                    <button class="btn" style="background-color: #ff4c4c;" @onclick='() => UpdateStatus(app.ID_Заявки, "Отклонено")'>⛔ Отклонить</button>
-                                </div>
+                                <button class="btn delete-btn" style="background-color: #777;" @onclick='() => DeleteApplication(app.ID_Заявки)'>🗑 Удалить заявку</button>
                             }
                         </div>
                     }
                 </div>
+
+                <!-- Модальное окно для полноразмерного изображения -->
+                @if (showFullImage)
+                {
+                    <div style="position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(0,0,0,0.9);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        z-index: 1000;"
+                         @onclick="CloseFullImage">
+
+                        <img src="@currentImageUrl"
+                             style="max-width: 90%;
+                            max-height: 90%;
+                            object-fit: contain;" />
+
+                        <button style="position: absolute;
+                              top: 20px;
+                              right: 20px;
+                              background: #ff4c4c;
+                              border: none;
+                              width: 40px;
+                              height: 40px;
+                              border-radius: 50%;
+                              color: white;
+                              font-size: 20px;
+                              cursor: pointer;"
+                                @onclick="CloseFullImage">
+                            ×
+                        </button>
+                    </div>
+                }
             }
 
             @if (!string.IsNullOrWhiteSpace(Message))
@@ -248,31 +373,85 @@
 
     private Dictionary<int, string> UserNames = new();
     private Dictionary<int, string> RoomNames = new();
+    private List<Аренда> AllRents = new();
 
+
+    private Dictionary<int, bool> ExpandedRenters = new(); // IdАрендатора → раскрыт или нет
+
+
+    private bool showFullImage = false;
+    private string currentImageUrl = string.Empty;
+
+    private void ShowFullImage(string imageUrl)
+    {
+        currentImageUrl = imageUrl;
+        showFullImage = true;
+    }
+
+    private void CloseFullImage()
+    {
+        showFullImage = false;
+        currentImageUrl = string.Empty;
+    }
 
     [Inject] public IWebHostEnvironment Env { get; set; }
+
+
+    private void ToggleRenter(int renterId)
+    {
+        if (ExpandedRenters.ContainsKey(renterId))
+            ExpandedRenters[renterId] = !ExpandedRenters[renterId];
+        else
+            ExpandedRenters[renterId] = true;
+    }
+
+    private async Task DeleteApplication(int id)
+    {
+        var app = await Db.ЗаявкиНаАренду.FindAsync(id);
+        if (app != null)
+        {
+            Db.ЗаявкиНаАренду.Remove(app);
+            await Db.SaveChangesAsync();
+            Message = "🗑 Заявка удалена";
+            IsError = false;
+            await LoadApplications();
+        }
+    }
 
 
     protected override async Task OnInitializedAsync()
     {
         await LoadRooms();
         await LoadRenters();
+        AllRents = await Db.Арендаs
+    .Include(a => a.IdПомещенияNavigation)
+    .ToListAsync();
+
         await LoadApplications();
     }
 
     private async Task LoadRooms()
     {
-        Rooms = await Db.Помещенияs.ToListAsync();
+        Rooms = await Db.Помещенияs
+     .OrderByDescending(r => r.IdПомещения)
+     .ToListAsync();
+
     }
 
     private async Task LoadRenters()
     {
-        Renters = await Db.Арендаторыs.ToListAsync();
+        Renters = await Db.Арендаторыs
+       .OrderByDescending(r => r.IdАрендатора) // или .ДатаРегистрации
+       .ToListAsync();
+
     }
 
     private async Task LoadApplications()
     {
-        Applications = await Db.ЗаявкиНаАренду.ToListAsync();
+        Applications = await Db.ЗаявкиНаАренду
+      .OrderByDescending(z => z.ДатаЗаявки)
+      .ToListAsync();
+
 
         var userIds = Applications.Select(z => z.ID_Пользователя).Distinct();
         var roomIds = Applications.Select(z => z.ID_Помещения).Distinct();
@@ -360,34 +539,34 @@
                             a.IdАрендатора == арендатор.IdАрендатора &&
                             a.IdПомещения == app.ID_Помещения);
 
-                    if (аренда1 != null)
-                    {
-                        string fileName = Guid.NewGuid() + ".pdf";
-                        string filePath = Path.Combine(Env.WebRootPath, "contracts", fileName);
-                        Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+                    // if (аренда1 != null)
+                    // {
+                    //     string fileName = Guid.NewGuid() + ".pdf";
+                    //     string filePath = Path.Combine(Env.WebRootPath, "contracts", fileName);
+                    //     Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
 
-                            string текст = "ДОГОВОР АРЕНДЫ\n\n" +
-                        $"Арендатор: {UserNames[app.ID_Пользователя]}\n" +
-                        $"Помещение: {RoomNames[app.ID_Помещения]}\n" +
-                        $"Площадь: {аренда1.IdПомещенияNavigation.Площадь} м²\n" +
-                        $"Этаж: {аренда1.IdПомещенияNavigation.Этаж}\n\n" +
-                        $"Дата начала: {аренда1.ДатаНачала:d}\n" +
-                        $"Дата окончания: {аренда1.ДатаОкончания:d}\n\n" +
-                        "Настоящим подтверждается аренда помещения сроком на месяц.";
+                    //         string текст = "ДОГОВОР АРЕНДЫ\n\n" +
+                    //     $"Арендатор: {UserNames[app.ID_Пользователя]}\n" +
+                    //     $"Помещение: {RoomNames[app.ID_Помещения]}\n" +
+                    //     $"Площадь: {аренда1.IdПомещенияNavigation.Площадь} м²\n" +
+                    //     $"Этаж: {аренда1.IdПомещенияNavigation.Этаж}\n\n" +
+                    //     $"Дата начала: {аренда1.ДатаНачала:d}\n" +
+                    //     $"Дата окончания: {аренда1.ДатаОкончания:d}\n\n" +
+                    //     "Настоящим подтверждается аренда помещения сроком на месяц.";
 
 
-                        QuestPDF.Fluent.Document.Create(container =>
-                        {
-                            container.Page(page =>
-                            {
-                                page.Margin(50);
-                                page.Content().Text(текст).FontSize(14);
-                            });
-                        }).GeneratePdf(filePath);
+                    //     QuestPDF.Fluent.Document.Create(container =>
+                    //     {
+                    //         container.Page(page =>
+                    //         {
+                    //             page.Margin(50);
+                    //             page.Content().Text(текст).FontSize(14);
+                    //         });
+                    //     }).GeneratePdf(filePath);
 
-                        app.Комментарий += $"\n[Договор] /contracts/{fileName}";
-                        await Db.SaveChangesAsync();
-                    }
+                    //     app.Комментарий += $"\n[Договор] /contracts/{fileName}";
+                    //     await Db.SaveChangesAsync();
+                    // }
                 }
             }
 

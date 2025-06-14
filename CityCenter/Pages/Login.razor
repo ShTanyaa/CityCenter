@@ -5,6 +5,7 @@
 @using System.Security.Cryptography
 @using System.Text
 @inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
 @inject AppDbContext Db
 <style>
     body {
@@ -410,5 +411,8 @@
         return Convert.ToHexString(hash).ToLower();
     }
 
-    private void GoHome() => Navigation.NavigateTo("/");
+    private async Task GoHome()
+    {
+        await JSRuntime.InvokeVoidAsync("history.back");
+    }
 }

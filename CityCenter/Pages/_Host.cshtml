@@ -31,6 +31,19 @@
 
     <script src="_framework/blazor.server.js"></script>
     <script src="site.js"></script>
+    <script>
+        window.scrollToRoomInfo = function () {
+            const roomCard = document.querySelector('.room-info');
+            if (!roomCard) return;
+
+            const rect = roomCard.getBoundingClientRect();
+            const isBelowViewport = rect.top > window.innerHeight || rect.bottom > window.innerHeight;
+
+            if (isBelowViewport) {
+                roomCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    </script>
 
 </body>
 </html>

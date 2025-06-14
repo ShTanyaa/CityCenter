@@ -1,0 +1,393 @@
+﻿@page "/rent-info"
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аренда помещений</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .screen {
+            width: 100%;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+            color: #333;
+        }
+
+        .sidebar {
+            width: 80px;
+            background: rgba(255, 255, 255, 0.95);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: width 0.3s ease;
+            overflow: hidden;
+            padding-top: 80px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+            .sidebar:hover {
+                width: 250px;
+            }
+
+            .sidebar ul {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+                .sidebar ul li {
+                    padding: 15px;
+                    color: #555;
+                    display: flex;
+                    align-items: center;
+                    cursor: pointer;
+                    transition: background 0.3s;
+                }
+
+                    .sidebar ul li:hover {
+                        background: rgba(0, 0, 0, 0.05);
+                    }
+
+                    .sidebar ul li i {
+                        font-size: 20px;
+                        width: 40px;
+                        text-align: center;
+                        color: #555;
+                    }
+
+                    .sidebar ul li span {
+                        opacity: 0;
+                        transition: opacity 0.3s;
+                        white-space: nowrap;
+                    }
+
+            .sidebar:hover ul li span {
+                opacity: 1;
+            }
+
+        .rent-full {
+            width: 100vw;
+            padding: 80px 10vw;
+            box-sizing: border-box;
+            background: linear-gradient(135deg, #f9f9f9, #f0f0f0);
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            font-size: 1.2rem;
+            line-height: 1.8;
+        }
+
+            .rent-full h1 {
+                font-size: 2.6rem;
+                color: #222;
+                margin-bottom: 30px;
+            }
+
+            .rent-full h2 {
+                font-size: 1.8rem;
+                color: #0066cc;
+                margin-top: 40px;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 8px;
+            }
+
+            .rent-full p {
+                margin: 15px 0;
+            }
+
+            .rent-full a {
+                color: #0066cc;
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+                .rent-full a:hover {
+                    text-decoration: underline;
+                }
+
+            .rent-full ul {
+                margin: 15px 0;
+                padding-left: 20px;
+            }
+
+        .footer {
+            background: #fff;
+            color: #666;
+            padding: 40px 20px;
+            width: 100%;
+            border-top: 1px solid #ddd;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .footer-content {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: space-between;
+        }
+
+        .footer-section {
+            flex: 1 1 250px;
+        }
+
+            .footer-section h3 {
+                color: #0066cc;
+                margin-bottom: 10px;
+                font-size: 1.5rem;
+            }
+
+            .footer-section p {
+                margin: 5px 0;
+                font-size: 1.1rem;
+            }
+
+            .footer-section a {
+                color: #0066cc;
+                text-decoration: none;
+            }
+
+                .footer-section a:hover {
+                    text-decoration: underline;
+                }
+
+        /* Стили для страницы документов */
+        #documents .rent-full {
+            background: #f9f9f9;
+        }
+
+        #documents h1 {
+            color: #222;
+        }
+
+        #documents h2 {
+            color: #0066cc;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #documents ul li a {
+            color: #333;
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            transition: color 0.2s;
+        }
+
+            #documents ul li a:hover {
+                color: #0066cc;
+            }
+
+            #documents ul li a i {
+                margin-right: 15px;
+                color: #0066cc;
+            }
+
+        .vk-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <ul>
+            <li onclick="showSection('home')">
+                <i class="fas fa-store"></i> <span>Аренда</span>
+            </li>
+
+            <li onclick="window.location.href='/login'">
+                <i class="fas fa-sign-in-alt"></i> <span>Вход</span>
+            </li>
+            <li onclick="window.location.href='/registration'">
+                <i class="fas fa-id-card"></i> <span>Регистрация</span>
+            </li>
+            <li onclick="showSection('documents')">
+                <i class="fas fa-file-alt"></i> <span>Документы</span>
+            </li>
+        </ul>
+    </nav>
+
+    <div id="home" class="screen">
+        <div class="rent-full">
+            <h1>Аренда помещений</h1>
+
+            <h2>Аренда магазинов в ТЦ «Сити Центр»</h2>
+            <p>
+                По всем вопросам, связаными с арендой  помещений обращайтесь на почту Сити Центра:<br />
+                <a href="mailto:citycentreekb@mail.ru">citycentreekb@mail.ru</a>
+            </p>
+
+            <h2>Аренда малых форм</h2>
+            <p>
+                Объектом аренды являются холловые магазины размером от 6 до 20 кв. м.<br />
+            </p>
+
+            <h2>Ограничения</h2>
+            <p><b style="color:#00ffcc">В аренду НЕ СДАЮТСЯ</b> площади для торговли:</p>
+            <ul>
+                <li>парфюмерией, косметикой;</li>
+                <li>табачной продукцией;</li>
+                <li>услугами операторов мобильной связи;</li>
+                <li>вендинговыми аппаратами;</li>
+                <li>продуктами питания (включая кофе с собой, мороженое, орехи, чай, мёд, кукурузу и др.).</li>
+            </ul>
+            <p>Заявки на аренду оформляются в <a href="/login">личном кабинете</a>. Все необходимые документы арендатор самостоятельно скачивает, заполняет и приносит к администрации ТЦ.</p>
+        </div>
+    </div>
+
+    <div id="documents" class="screen hidden">
+        <div class="rent-full" style="font-size: 1.4rem; padding: 40px 10vw; color: white;">
+            <h1 style="font-size: 3rem; margin-bottom: 40px; color: black;">Документы</h1>
+
+            <h2 style="font-size: 2.2rem; color: black; margin: 50px 0 25px 0; border-bottom: 2px solid #00aaff; padding-bottom: 10px;">Требования и правила</h2>
+            <ul style="font-size: 1.4rem; line-height: 2.2; margin: 30px 0; padding-left: 30px; color: black;">
+                <li style="margin-bottom: 20px; color: black;">
+                    <a href="./documents/project_documentation.docx" download style="font-size: 1.4rem; color: black;">
+                        <i class="fas fa-file" style="margin-right: 15px; color: #00aaff;"></i> Порядок разработки и согласования проектной документации (PDF, 1.2 МБ)
+                    </a>
+                </li>
+                <li style="margin-bottom: 20px; color: black;">
+                    <a href="/documents/tenant_rules.doc" download style="font-size: 1.4rem; color: black;">
+                        <i class="fas fa-file" style="margin-right: 15px; color: #00aaff;"></i> Краткие правила для арендаторов (.doc, 90 Кб)
+                    </a>
+                </li>
+                <li style="margin-bottom: 20px; color: black;">
+                    <a href="/documents/signage_requirements.doc" download style="font-size: 1.4rem; color: black;">
+                        <i class="fas fa-file" style="margin-right: 15px; color: #00aaff;"></i> Технические требования к вывескам (.doc, 5.28 Мб)
+                    </a>
+                </li>
+                <li style="margin-bottom: 20px; color: black;">
+                    <a href="/documents/responsible_person.docx" download style="font-size: 1.4rem; color: black;">
+                        <i class="fas fa-file" style="margin-right: 15px; color: #00aaff;"></i> Памятка о назначении ответственного лица (.docx, 641 Кб)
+                    </a>
+                </li>
+            </ul>
+
+            <h2 style="font-size: 2.2rem; color: black; margin: 50px 0 25px 0; border-bottom: 2px solid #00aaff; padding-bottom: 10px;">Бланки заявок</h2>
+            <ul style="font-size: 1.4rem; line-height: 2.2; margin: 30px 0; padding-left: 30px; color: black;">
+                <li style="margin-bottom: 20px; color: black;">
+                    <a href="/documents/advertising_work_form.doc" download style="font-size: 1.4rem; color: black;">
+                        <i class="fas fa-file" style="margin-right: 15px; color: #00aaff;"></i> Бланк на работы рекламного характера (.doc, 32.5 Кб)
+                    </a>
+                </li>
+                <li style="margin-bottom: 20px; color: black;">
+                    <a href="/documents/night_advertising_form.doc" download style="font-size: 1.4rem; color: black;">
+                        <i class="fas fa-file" style="margin-right: 15px; color: #00aaff;"></i> Бланк на ночные работы рекламного характера (.doc, 35 Кб)
+                    </a>
+                </li>
+                <li style="margin-bottom: 20px; color: black;">
+                    <a href="/documents/night_work_form.doc" download style="font-size: 1.4rem; color: black;">
+                        <i class="fas fa-file" style="margin-right: 15px; color: #00aaff;"></i> Бланк на ночные работы (.doc, 30.5 Кб)
+                    </a>
+                </li>
+                <li style="margin-bottom: 20px; color: black;">
+                    <a href="/documents/construction_permit.doc" download style="font-size: 1.4rem; color: black;">
+                        <i class="fas fa-file" style="margin-right: 15px; color: #00aaff;"></i> Акт-допуск на строительно-монтажные работы (.doc, 24.7 Кб)
+                    </a>
+                </li>
+                <li style="margin-bottom: 20px; color: black;">
+                    <a href="/documents/premises_commissioning_act.doc" download style="font-size: 1.4rem; color: black;">
+                        <i class="fas fa-file" style="margin-right: 15px; color: #00aaff;"></i> Акт ввода в эксплуатацию арендуемого помещения (.doc, 28 Кб)
+                    </a>
+                </li>
+                <li style="margin-bottom: 20px; color: black;">
+                    <a href="/documents/ac_maintenance.doc" download style="font-size: 1.4rem; color: black;">
+                        <i class="fas fa-file" style="margin-right: 15px; color: #00aaff;"></i> Акт допуска на техническое обслуживание систем кондиционирования (.doc, 43 Кб)
+                    </a>
+                </li>
+                <li style="margin-bottom: 20px; color: black;">
+                    <a href="/documents/fire_alarm_maintenance.doc" download style="font-size: 1.4rem; color: black;">
+                        <i class="fas fa-file" style="margin-right: 15px; color: #00aaff;"></i> Акт допуска на обслуживание ОПС (.doc, 43.5 Кб)
+                    </a>
+                </li>
+                <li style="margin-bottom: 20px; color: black;">
+                    <a href="/documents/work_permit.doc" download style="font-size: 1.4rem; color: black;">
+                        <i class="fas fa-file" style="margin-right: 15px; color: #00aaff;"></i> Наряд-допуск на выполнение работ (.doc, 22 Кб)
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>График работы</h3>
+                <p>Пн-Пт с 10:00 - 21:00</p>
+                <p>Сб-Вс с 10:00 - 20:00</p>
+            </div>
+            <div class="footer-section">
+                <h3>Контакты</h3>
+                <p>Телефон: +7 (343) 350-16-42</p>
+                <p>
+                    <a href="https://vk.com/tkcitycenter" target="_blank" class="vk-link">
+                        <i class="fab fa-vk" style="color: #1471b8;"></i> Мы ВКонтакте
+                    </a>
+                </p>
+            </div>
+            <div class="footer-section">
+                <h3>Мы на карте</h3>
+                <iframe src="https://yandex.ru/map-widget/v1/?um=constructor%3Add899fd962263cd1eab940908e9aca477fca3498c3eaa82faa2b1151666dd29c&amp;source=constructor" width="400" height="150" frameborder="0"></iframe>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function showSection(sectionId) {
+            // Скрыть все экраны
+            document.querySelectorAll('.screen').forEach(el => {
+                el.classList.add('hidden');
+            });
+
+            // Показать выбранный экран
+            const target = document.getElementById(sectionId);
+            if (target) {
+                target.classList.remove('hidden');
+            }
+        }
+
+        // Показать домашнюю страницу по умолчанию
+        document.addEventListener('DOMContentLoaded', function () {
+            showSection('home');
+        });
+    </script>
+</body>
+</html>
+
+
+
+@code {
+    private void NavigateToLogin() => Navigation.NavigateTo("/login");
+    private void NavigateToReg() => Navigation.NavigateTo("/registration");
+
+    private async Task ShowSectionAsync(string sectionId)
+    {
+        await JS.InvokeVoidAsync("showSection", sectionId);
+    }
+}
+
+
+
