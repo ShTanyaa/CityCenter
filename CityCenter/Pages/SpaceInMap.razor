@@ -7,9 +7,14 @@
 @inject NavigationManager NavigationManager
 @implements IAsyncDisposable
 @using System.Text.RegularExpressions;
+@inject IJSRuntime JSRuntime
 
-
+@inject ThemeService ThemeService
+<!DOCTYPE html>
+<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
+<head>
 <style>
+    /* Основные стили (тёмная тема по умолчанию) */
     body {
         font-family: 'Poppins', sans-serif;
         background: linear-gradient(135deg, #0a0a0a, #111);
@@ -17,7 +22,24 @@
         margin: 0;
         padding: 0;
         overflow-x: hidden;
+        transition: all 0.3s ease;
     }
+
+    .back-arrow {
+        position: absolute;
+        top: 30px;
+        left: 30px;
+        font-size: 2rem;
+        cursor: pointer;
+        color: #00aaff;
+        transition: transform 0.2s ease;
+        z-index: 10;
+    }
+
+        .back-arrow:hover {
+            transform: scale(1.2);
+            color: #0088cc;
+        }
 
     .map-screen {
         display: flex;
@@ -50,8 +72,6 @@
         width: 100vw;
         height: 80vh;
     }
-
-
 
     .room-info {
         background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(40, 40, 40, 0.95));
@@ -111,7 +131,6 @@
             transition: all 0.3s ease;
         }
 
-
     .svg-disabled {
         opacity: 0.25;
         pointer-events: none;
@@ -125,12 +144,11 @@
         cursor: not-allowed !important;
     }
 
-    svg [id^="Vector_"],
+    svg [id^="Vector"],
     svg [id^="icon"],
     svg .icon {
         display: none !important;
     }
-
 
     .floor-selector {
         font-size: 1.3rem;
@@ -143,11 +161,75 @@
         box-shadow: 0 0 10px #00aaff;
     }
 
+    /* Светлая тема */
+    body.light-theme {
+        background: linear-gradient(135deg, #f5f7fa, #e4e8eb) !important;
+        color: #333 !important;
+    }
+
+    .light-theme .back-arrow {
+        color: #0078d7 !important;
+    }
+
+        .light-theme .back-arrow:hover {
+            color: #005fa3 !important;
+        }
+
+    .light-theme .map-title {
+        color: #0078d7 !important;
+        text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .light-theme .room-info {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 245, 245, 0.95)) !important;
+        color: #333 !important;
+        box-shadow: 0 0 40px rgba(0, 120, 215, 0.4) !important;
+        border: 1px solid #e0e0e0 !important;
+    }
+
+        .light-theme .room-info:hover {
+            box-shadow: 0 0 50px rgba(0, 120, 215, 0.6) !important;
+        }
+
+        .light-theme .room-info b {
+            color: #00a859 !important;
+        }
+
+    .light-theme .btn {
+        background-color: #0078d7 !important;
+        color: white !important;
+    }
+
+        .light-theme .btn:hover {
+            background-color: #0066cc !important;
+        }
+
+    .light-theme svg .selected {
+        fill: #00a859 !important;
+        stroke: #008744 !important;
+        filter: drop-shadow(0 0 10px #00a859) !important;
+    }
+
+    .light-theme svg g[id^="Store-"]:hover {
+        filter: drop-shadow(0 0 6px #0078d7) !important;
+    }
+
+        .light-theme svg g[id^="Store-"]:hover rect {
+            fill: rgba(0, 120, 215, 0.15) !important;
+            stroke: #0078d7 !important;
+        }
+
+    .light-theme .floor-selector {
+        background-color: #fff !important;
+        color: #333 !important;
+        box-shadow: 0 0 10px rgba(0, 120, 215, 0.5) !important;
+        border: 1px solid #ddd !important;
+    }
 </style>
-
-
-
+</head>
+<body class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
 <div class="map-screen">
+    <div class="back-arrow" @onclick="GoBack">←</div>
     <h2 class="map-title">Выберите помещение на карте</h2>
     <select @onchange="OnFloorChanged" class="floor-selector">
         <option value="1">1 этаж</option>
@@ -179,13 +261,20 @@
     }
 </div>
 
-
+</body>
+</html>
 
 @code {
     private string SvgContent = "";
     private Dictionary<string, Помещения> Доступные = new();
     private Помещения? SelectedRoom;
     private ElementReference RoomInfoRef;
+
+
+    private async Task GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("history.back");
+    }
 
     protected override async Task OnInitializedAsync()
     {

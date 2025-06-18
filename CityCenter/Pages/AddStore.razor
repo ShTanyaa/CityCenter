@@ -7,10 +7,31 @@
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
 @implements IAsyncDisposable
+@inject IJSRuntime JSRuntime
 @using System.Text.RegularExpressions;
 
-
+@inject ThemeService ThemeService
+<!DOCTYPE html>
+<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
+<head>
 <style>
+     
+    /* Общие стили */
+    .back-arrow {
+        position: absolute;
+        top: 30px;
+        left: 30px;
+        font-size: 2rem;
+        cursor: pointer;
+        color: #00aaff;
+        transition: transform 0.2s ease;
+        z-index: 10;
+    }
+
+        .back-arrow:hover {
+            transform: scale(1.2);
+            color: #0088cc;
+        }
 
     /* Подсветка выбранного помещения */
     svg .selected {
@@ -19,7 +40,7 @@
         filter: drop-shadow(0 0 10px #00ff88);
     }
 
-    /* Подсветка при наведении без сдвига и масштабирования */
+    /* Подсветка при наведении */
     svg g[id^="Store-"]:hover {
         cursor: pointer;
         transition: filter 0.2s ease;
@@ -31,7 +52,6 @@
             stroke: #00aaff !important;
             transition: all 0.3s ease;
         }
-
 
     .svg-disabled {
         opacity: 0.25;
@@ -46,34 +66,26 @@
         cursor: not-allowed !important;
     }
 
+    svg [id^="Vector"],
     svg [id^="Vector_"],
     svg [id^="icon"],
     svg .icon {
         display: none !important;
     }
 
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a, #111) fixed; /* Добавлено fixed */
+            color: white;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box; /* Важно! */
+        }
 
-    .floor-selector {
-        font-size: 1.3rem;
-        padding: 10px 20px;
-        margin-bottom: 20px;
-        border-radius: 10px;
-        border: none;
-        background-color: #1e1e1e;
-        color: white;
-        box-shadow: 0 0 10px #00aaff;
-    }
-
-    body {
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #0a0a0a, #111);
-        color: white;
-        margin: 0;
-        padding: 40px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
 
     h1 {
         margin-bottom: 30px;
@@ -86,7 +98,6 @@
         padding: 20px;
         border-radius: 20px;
     }
-
 
     .btn {
         margin-top: 20px;
@@ -164,8 +175,80 @@
             border-color: #00ff88;
         }
 
+    /* Светлая тема */
+
+        .light-theme {
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0) !important;
+        }
+        .light-theme .map-wrapper {
+            background-color: #fff; /* или любой другой светлый цвет */
+        }
+
+        body.light-theme {
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0) fixed;
+            color: #333;
+        }
+
+    .light-theme .back-arrow {
+        color: #0078d7;
+    }
+
+        .light-theme .back-arrow:hover {
+            color: #005fa3;
+        }
+
+    .light-theme .map-wrapper {
+        background-color: #fff;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .light-theme .btn {
+        background-color: #0078d7;
+        color: white;
+    }
+
+        .light-theme .btn:hover {
+            background-color: #0066cc;
+        }
+
+    .light-theme .info {
+        background: rgba(0, 0, 0, 0.05);
+        color: #333;
+    }
+
+    .light-theme .form-group input,
+    .light-theme .form-group select {
+        background-color: #fff;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+
+    .light-theme .floor-selector {
+        background-color: #fff;
+        color: #333;
+        border: 2px solid #0078d7;
+    }
+
+        .light-theme .floor-selector:focus {
+            border-color: #00a859;
+        }
+
+    /* Адаптация SVG для светлой темы */
+    .light-theme svg .selected {
+        fill: #00a859 !important;
+        stroke: #008744 !important;
+        filter: drop-shadow(0 0 10px #00a859);
+    }
+
+    .light-theme svg g[id^="Store-"]:hover rect {
+        fill: rgba(0, 120, 215, 0.15) !important;
+        stroke: #0078d7 !important;
+    }
 </style>
+</head>
+<body class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
 <div style="display: flex; flex-direction: column; align-items: center;">
+    <div class="back-arrow" @onclick="GoBack">←</div>
     <h2>Добавление помещения</h2>
     <h2 class="map-title">Выберите помещение на карте</h2>
     <select @onchange="OnFloorChanged" class="floor-selector">
@@ -232,8 +315,18 @@
 
             <button class="btn" type="submit">Сохранить</button>
         </form>
+            @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+            {
+                <div class="error-message">@ErrorMessage</div>
+            }
+            @if (!string.IsNullOrWhiteSpace(SuccessMessage))
+            {
+                <div class="success-message">@SuccessMessage</div>
+            }
     </div>
 }
+</body>
+</html>
 
 @code {
     private string? selectedRoomId;
@@ -246,12 +339,13 @@
     private IBrowserFile? UploadedFile;
     private string SvgContent = "";
     private Помещения? SelectedRoom;
+    [Inject] public IWebHostEnvironment Env { get; set; }
     private Dictionary<string, Помещения> Доступные = new();
     private ElementReference RoomInfoRef;
 
     private HashSet<string> ExistingRoomIds = new();
 
-
+    private string? SuccessMessage;
 
     private List<НазначенияПомещений> Purposes = new();
 
@@ -261,7 +355,10 @@
         await LoadSvgForFloor(SelectedFloor);
     }
 
-
+    private async Task GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("history.back");
+    }
 
 
     private async Task OnFloorChanged(ChangeEventArgs e)
@@ -379,40 +476,125 @@
         Console.WriteLine(SvgContent.Contains("svg-disabled") ? "✅ svg-disabled есть" : "❌ svg-disabled не найден");
 
     }
+    // Можно добавить проверку типа файла
     private async Task HandleFileUpload(InputFileChangeEventArgs e)
     {
+        const long maxFileSize = 2 * 1024 * 1024;
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+
+        var fileExt = Path.GetExtension(e.File.Name).ToLower();
+
+        if (!allowedExtensions.Contains(fileExt))
+        {
+            ErrorMessage = "❌ Можно загружать только изображения (JPG, PNG, WebP)";
+            return;
+        }
+
+        if (e.File.Size > maxFileSize)
+        {
+            ErrorMessage = $"❌ Максимальный размер файла: {maxFileSize / 1024 / 1024} МБ";
+            return;
+        }
+
         UploadedFile = e.File;
+        ErrorMessage = null; // Сбрасываем ошибку если файл подходит
     }
+
+    private string? ErrorMessage;
 
     private async Task HandleFormSubmit()
     {
-        var newRoom = new Помещения
-            {
-                Название = RoomName,
-                Этаж = SelectedFloor,
-                Площадь = Area,
-                СтоимостьАренды = RentPrice,
-                Расположение = selectedRoomId!,
-                ДоступноДляАренды = true,
-                Описание = Description,
-                IdНазначения = SelectedPurposeId,
-                Фото = UploadedFile != null ? await UploadImage(UploadedFile) : null
-            };
+        // Сбрасываем сообщение об ошибке
+        ErrorMessage = null;
+        SuccessMessage = null;
 
-        Db.Помещенияs.Add(newRoom);
-        await Db.SaveChangesAsync();
+        // Проверка названия
+        if (string.IsNullOrWhiteSpace(RoomName))
+        {
+            ErrorMessage = "❌ Название помещения обязательно для заполнения";
+            return;
+        }
 
-        selectedRoomId = null;
-        SelectedRoom = null;
+        // Проверка площади
+        if (Area < 5 || Area > 300)
+        {
+            ErrorMessage = "❌ Площадь должна быть от 5 до 300 м²";
+            return;
+        }
+
+        // Проверка стоимости аренды
+        if (RentPrice < 10000)
+        {
+            ErrorMessage = "❌ Стоимость аренды должна быть не менее 10,000 ₽";
+            return;
+        }
+
+        // Проверка назначения
+        if (SelectedPurposeId == null)
+        {
+            ErrorMessage = "❌ Необходимо выбрать назначение помещения";
+            return;
+        }
+
+        try
+        {
+            var newRoom = new Помещения
+                {
+                    Название = RoomName,
+                    Этаж = SelectedFloor,
+                    Площадь = Area,
+                    СтоимостьАренды = RentPrice,
+                    Расположение = selectedRoomId!,
+                    ДоступноДляАренды = true,
+                    Описание = Description,
+                    IdНазначения = SelectedPurposeId,
+                    Фото = UploadedFile != null ? await UploadImage(UploadedFile) : null
+                };
+
+            Db.Помещенияs.Add(newRoom);
+            await Db.SaveChangesAsync();
+
+            SuccessMessage = "✅ Помещение успешно добавлено!";
+
+            // Сброс формы после успешного сохранения
+            selectedRoomId = null;
+            SelectedRoom = null;
+            RoomName = "";
+            Area = 0;
+            RentPrice = 0;
+            SelectedPurposeId = null;
+            Description = "";
+            UploadedFile = null;
+
+            // Обновляем SVG, чтобы новое помещение отобразилось как занятое
+            await LoadSvgForFloor(SelectedFloor);
+
+            // Через 3 секунды убираем сообщение об успехе
+            await Task.Delay(3000);
+            SuccessMessage = null;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"❌ Ошибка при сохранении: {ex.Message}";
+        }
     }
 
 
     private async Task<string> UploadImage(IBrowserFile file)
     {
         var fileName = Path.GetRandomFileName() + Path.GetExtension(file.Name);
-        var path = Path.Combine("wwwroot", "images", fileName);
-        await using var stream = new FileStream(path, FileMode.Create);
-        await file.OpenReadStream().CopyToAsync(stream);
+        var folderPath = Path.Combine(Env.WebRootPath, "images");
+
+        if (!Directory.Exists(folderPath))
+            Directory.CreateDirectory(folderPath);
+
+        var filePath = Path.Combine(folderPath, fileName);
+
+        // Увеличиваем лимит до 2 МБ (или другого нужного вам значения)
+        await using var stream = new FileStream(filePath, FileMode.Create);
+        await file.OpenReadStream(maxAllowedSize: 2 * 1024 * 1024).CopyToAsync(stream); // 2 МБ
+
         return "/images/" + fileName;
     }
     private void OnFloorChange(ChangeEventArgs e)
@@ -422,5 +604,6 @@
             SelectedFloor = floor;
         }
     }
-}  
+}
+
 

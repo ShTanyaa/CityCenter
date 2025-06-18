@@ -3,15 +3,38 @@
 @using CityCenter.Models
 @inject NavigationManager NavigationManager
 @inject AppDbContext Db
-
+@inject IJSRuntime JSRuntime
+@inject ThemeService ThemeService
+<!DOCTYPE html>
+<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
+<head>
 <style>
+    /* Общие стили */
+    .back-arrow {
+        position: absolute;
+        top: 30px;
+        left: 30px;
+        font-size: 2rem;
+        cursor: pointer;
+        color: #00aaff;
+        transition: transform 0.2s ease;
+        z-index: 10;
+    }
+
+        .back-arrow:hover {
+            transform: scale(1.2);
+            color: #0088cc;
+        }
+
     body {
         font-family: 'Poppins', sans-serif;
         background: linear-gradient(135deg, #0a0a0a, #111);
         color: #fff;
         margin: 0;
         padding: 0;
+        min-height: 100vh;
     }
+
     .edit-screen {
         display: flex;
         flex-direction: column;
@@ -40,10 +63,10 @@
         transition: box-shadow 0.3s ease;
     }
 
-    .form-control:focus {
-        outline: none;
-        box-shadow: 0 0 10px #00aaff;
-    }
+        .form-control:focus {
+            outline: none;
+            box-shadow: 0 0 10px #00aaff;
+        }
 
     .btn {
         padding: 18px 35px;
@@ -57,101 +80,195 @@
         transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .btn:hover {
-        background: #0088cc;
-        transform: scale(1.03);
-        box-shadow: 0 0 10px #00aaff;
-    }
+        .btn:hover {
+            background: #0088cc;
+            transform: scale(1.03);
+            box-shadow: 0 0 10px #00aaff;
+        }
 
     .message {
         margin-top: 20px;
         font-size: 1.2rem;
         color: #4caf50;
     }
-</style>
 
-<div class="edit-screen">
-    <h2>Редактировать помещение</h2>
-
-   @if (room != null)
-{
-    <InputFile OnChange="HandleFileUpload" accept="image/*" />
-    @if (!string.IsNullOrEmpty(room.Фото))
-    {
-        <img src="@room.Фото" alt="Текущее фото" style="max-width: 300px; margin-top: 10px; border-radius: 10px;" />
+    /* Светлая тема */
+    body.light-theme {
+        background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+        color: #333;
     }
 
-    <input class="form-control" @bind="room.Название" placeholder="Название" />
-    <input type="number" class="form-control" @bind="room.Этаж" placeholder="Этаж" />
-    <input type="number" class="form-control" @bind="room.Площадь" placeholder="Площадь (м²)" />
-    <textarea class="form-control" @bind="room.Описание" placeholder="Описание помещения"></textarea>
-
-    <select class="form-control" @bind="room.ДоступноДляАренды">
-        <option value="true">Доступно</option>
-        <option value="false">Занято</option>
-    </select>
-
-    <button class="btn" @onclick="SaveChanges">💾 Сохранить</button>
-        <button class="btn" style="background-color: gray; margin-left: 10px;" @onclick='() => NavigationManager.NavigateTo("/admin-dashboard")'>← Назад</button>
-
-    @if (!string.IsNullOrWhiteSpace(Message))
-    {
-        <div class="message">@Message</div>
+    .light-theme .edit-screen {
+        background: transparent;
     }
-}
-else
-{
-    <p>Загрузка данных...</p>
-}
 
-</div>
+    .light-theme h2 {
+        color: #222;
+        text-shadow: none;
+    }
 
-@code {
-   [Parameter] public int id { get; set; }
-[Inject] public IWebHostEnvironment Env { get; set; }
+    .light-theme .back-arrow {
+        color: #0078d7;
+    }
 
-private Помещения? room;
-private string? Message;
-private IBrowserFile? UploadedFile;
-
-protected override async Task OnInitializedAsync()
-{
-    room = await Db.Помещенияs.FindAsync(id);
-}
-
-private async Task SaveChanges()
-{
-    if (room != null)
-    {
-        if (UploadedFile != null)
-        {
-            room.Фото = await UploadImage(UploadedFile);
+        .light-theme .back-arrow:hover {
+            color: #005fa3;
         }
 
-        Db.Помещенияs.Update(room);
-        await Db.SaveChangesAsync();
-        Message = "✅ Изменения сохранены";
+    .light-theme .form-control {
+        background-color: #fff;
+        color: #333;
+        border: 1px solid #ddd;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-}
 
-private async Task HandleFileUpload(InputFileChangeEventArgs e)
-{
-    UploadedFile = e.File;
-}
+        .light-theme .form-control:focus {
+            box-shadow: 0 0 10px rgba(0, 120, 215, 0.5);
+        }
 
-private async Task<string> UploadImage(IBrowserFile file)
-{
-    var fileName = Path.GetRandomFileName() + Path.GetExtension(file.Name);
-    var folderPath = Path.Combine(Env.WebRootPath, "images");
+    .light-theme .btn {
+        background: #0078d7;
+        color: white;
+    }
 
-    if (!Directory.Exists(folderPath))
-        Directory.CreateDirectory(folderPath);
+        .light-theme .btn:hover {
+            background: #0066cc;
+            box-shadow: 0 0 10px rgba(0, 120, 215, 0.5);
+        }
 
-    var filePath = Path.Combine(folderPath, fileName);
-    await using var stream = new FileStream(filePath, FileMode.Create);
-    await file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024).CopyToAsync(stream);
+    .light-theme .message {
+        color: #2e7d32;
+    }
+</style>
+</head>
+<body class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
+    <div class="edit-screen">
+        <div class="back-arrow" @onclick="GoBack">←</div>
+        <h2>Редактировать помещение</h2>
 
-    return "/images/" + fileName;
-}
+        @if (room != null)
+        {
+            <InputFile OnChange="HandleFileUpload" accept="image/*" />
+            @if (!string.IsNullOrEmpty(room.Фото))
+            {
+                <img src="@room.Фото" alt="Текущее фото" style="max-width: 300px; margin-top: 10px; border-radius: 10px;" />
+            }
 
+            <input class="form-control" @bind="room.Название" placeholder="Название" />
+            <input type="number" class="form-control" @bind="room.Этаж" min="1" max="4" placeholder="Этаж (1-4)" />
+            <input type="number" class="form-control" @bind="room.Площадь" min="5" max="300" placeholder="Площадь (5-300 м²)" />
+            <textarea class="form-control" @bind="room.Описание" placeholder="Описание помещения"></textarea>
+
+            <select class="form-control" @bind="room.ДоступноДляАренды">
+                <option value="true">Доступно</option>
+                <option value="false">Занято</option>
+            </select>
+
+            <button class="btn" @onclick="SaveChanges">💾 Сохранить</button>
+            <button class="btn" style="background-color: gray; margin-left: 10px;" @onclick='() => NavigationManager.NavigateTo("/admin-dashboard")'>← Назад</button>
+
+            @if (!string.IsNullOrWhiteSpace(Message))
+            {
+                <div class="message">@Message</div>
+            }
+        }
+        else
+        {
+            <p>Загрузка данных...</p>
+        }
+
+    </div>
+</body>
+</html>
+@code {
+    [Parameter] public int id { get; set; }
+    [Inject] public IWebHostEnvironment Env { get; set; }
+
+    private Помещения? room;
+    private string? Message;
+    private IBrowserFile? UploadedFile;
+
+    protected override async Task OnInitializedAsync()
+    {
+        room = await Db.Помещенияs.FindAsync(id);
+    }
+
+    private async Task GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("history.back");
+    }
+
+    private async Task SaveChanges()
+    {
+        if (room != null)
+        {
+            // Проверка площади
+            if (room.Название=="")
+            {
+                Message = "❌ Укажите название помещения";
+                return;
+            }
+
+          
+
+            // Проверка площади
+            if (room.СтоимостьАренды < 10000)
+            {
+                Message = "❌ Стоимость аренды должна быть не менее 10,000 ₽";
+                return;
+            }
+
+           
+
+            if (UploadedFile != null)
+            {
+                room.Фото = await UploadImage(UploadedFile);
+            }
+
+            Db.Помещенияs.Update(room);
+            await Db.SaveChangesAsync();
+            Message = "✅ Изменения сохранены";
+        }
+    }
+
+    // Можно добавить проверку типа файла
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        const long maxFileSize = 2 * 1024 * 1024;
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+
+        var fileExt = Path.GetExtension(e.File.Name).ToLower();
+
+        if (!allowedExtensions.Contains(fileExt))
+        {
+            Message = "❌ Можно загружать только изображения (JPG, PNG, WebP)";
+            return;
+        }
+
+        if (e.File.Size > maxFileSize)
+        {
+            Message = $"❌ Максимальный размер файла: {maxFileSize / 1024 / 1024} МБ";
+            return;
+        }
+
+        UploadedFile = e.File;
+        Message = null; // Сбрасываем ошибку если файл подходит
+    }
+
+    private async Task<string> UploadImage(IBrowserFile file)
+    {
+        var fileName = Path.GetRandomFileName() + Path.GetExtension(file.Name);
+        var folderPath = Path.Combine(Env.WebRootPath, "images");
+
+        if (!Directory.Exists(folderPath))
+            Directory.CreateDirectory(folderPath);
+
+        var filePath = Path.Combine(folderPath, fileName);
+
+        // Увеличиваем лимит до 2 МБ (или другого нужного вам значения)
+        await using var stream = new FileStream(filePath, FileMode.Create);
+        await file.OpenReadStream(maxAllowedSize: 2 * 1024 * 1024).CopyToAsync(stream); // 2 МБ
+
+        return "/images/" + fileName;
+    }
 }

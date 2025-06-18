@@ -7,9 +7,10 @@
 @inject IJSRuntime JS
 @implements IAsyncDisposable
 @using System.Text.RegularExpressions;
+@inject ThemeService ThemeService
 
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
 <head>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -18,6 +19,234 @@
     <title>Торговый Центр</title>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <style>
+        /* Основные стили светлой темы */
+        .light-theme {
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0) !important;
+            color: #333 !important;
+        }
+
+            .light-theme body {
+                background: linear-gradient(135deg, #f0f0f0, #e0e0e0) !important;
+                color: #333 !important;
+            }
+
+            /* Сайдбар */
+            .light-theme .sidebar {
+                background: rgba(255, 255, 255, 0.9) !important;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1) !important;
+            }
+
+                .light-theme .sidebar ul li {
+                    color: #333 !important;
+                }
+
+                    .light-theme .sidebar ul li:hover {
+                        background: rgba(0, 0, 0, 0.1) !important;
+                    }
+
+            /* Блоки контента */
+            .light-theme .block {
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(240, 240, 240, 0.8)) !important;
+                color: #333 !important;
+                box-shadow: 0 0 12px rgba(0, 0, 0, 0.1) !important;
+            }
+
+                .light-theme .block:hover {
+                    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(220, 240, 255, 0.7)) !important;
+                    box-shadow: 0 0 20px rgba(0, 120, 215, 0.3) !important;
+                }
+
+            /* Панель поиска */
+            .light-theme .search-panel {
+                background: rgba(255, 255, 255, 0.95) !important;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+            }
+
+                .light-theme .search-panel input {
+                    background: #f0f0f0 !important;
+                    color: #333 !important;
+                    border: 1px solid #ddd !important;
+                }
+
+            /* Кнопки */
+            .light-theme button {
+                color: white !important; /* Сохраняем цвет текста белым для контраста */
+            }
+
+            /* Карта ТЦ */
+            .light-theme .svg-container {
+                background-color: #f8f8f8 !important;
+            }
+
+            /* Информация о помещении */
+            .light-theme .room-info {
+                background: linear-gradient(135deg, rgba(240, 240, 240, 0.95), rgba(230, 230, 230, 0.95)) !important;
+                color: #333 !important;
+                box-shadow: 0 0 40px rgba(0, 120, 215, 0.3) !important;
+            }
+
+                .light-theme .room-info b {
+                    color: #0078d7 !important;
+                }
+
+            /* Подвал */
+            .light-theme .footer {
+                background: #e0e0e0 !important;
+                color: #555 !important;
+                border-top: 2px solid #ccc !important;
+            }
+
+            .light-theme .footer-section h3 {
+                color: #0078d7 !important;
+            }
+
+            .light-theme .vk-link {
+                color: #555 !important;
+            }
+
+                .light-theme .vk-link:hover {
+                    color: #333 !important;
+                }
+
+            /* Формы входа */
+            .light-theme .login-box {
+                background: linear-gradient(135deg, rgba(240, 240, 240, 0.95), rgba(230, 230, 230, 0.95)) !important;
+                color: #333 !important;
+                box-shadow: 0 0 40px rgba(0, 0, 0, 0.1) !important;
+            }
+
+            .light-theme .login-input {
+                background-color: #f0f0f0 !important;
+                color: #333 !important;
+                border: 1px solid #ddd !important;
+            }
+
+                .light-theme .login-input:focus {
+                    box-shadow: 0 0 10px rgba(0, 120, 215, 0.5) !important;
+                }
+
+            .light-theme .back-button.inside {
+                color: #666 !important;
+            }
+
+                .light-theme .back-button.inside:hover {
+                    color: #333 !important;
+                }
+
+            .light-theme .login-link {
+                color: #666 !important;
+            }
+
+                .light-theme .login-link:hover {
+                    color: #333 !important;
+                }
+
+            /* Элементы управления картой */
+            .light-theme .floor-controls button {
+                background-color: #0078d7 !important;
+            }
+
+                .light-theme .floor-controls button:hover {
+                    background-color: #005a9e !important;
+                }
+
+            /* Специфические элементы для арендованных/неарендованных помещений */
+            .light-theme g.rented:hover rect {
+                fill: rgba(0, 120, 215, 0.15) !important;
+                stroke: #0078d7 !important;
+            }
+
+            .light-theme svg g[id^="Store-"]:hover {
+                filter: drop-shadow(0 0 6px #0078d7) !important;
+            }
+
+                .light-theme svg g[id^="Store-"]:hover rect {
+                    fill: rgba(0, 120, 215, 0.15) !important;
+                    stroke: #0078d7 !important;
+                }
+
+            .light-theme svg .selected {
+                fill: #00a2b1 !important;
+                stroke: #008a96 !important;
+                filter: drop-shadow(0 0 10px #00a2b1) !important;
+            }
+
+            /* Адаптация для элементов с прозрачностью */
+            .light-theme .not-rented {
+                opacity: 0.4 !important;
+                filter: grayscale(1) brightness(1.2) !important;
+            }
+
+            /* Заголовки */
+            .light-theme .welcome-text {
+                color: #333 !important;
+                text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2) !important;
+            }
+
+            /* Скролл вниз */
+            .light-theme .scroll-down {
+                color: #0078d7 !important;
+            }
+
+        /* Скрываем все группы с иконками по умолчанию */
+        g[id^="Store-"] g[id^="body"],
+        g[id^="Store-"] g[id^="close"],
+        g[id^="Store-"] [id^="Vector_"] {
+            display: none;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Показываем иконки только для арендованных помещений */
+        g.rented g[id^="body"],
+        g.rented g[id^="close"],
+        g.rented [id^="Vector_"] {
+            display: block !important;
+            opacity: 1 !important;
+            pointer-events: none !important;
+        }
+
+        /* Стили для помещений */
+        .rented {
+            cursor: pointer;
+            fill: #yourRentedColor;
+        }
+
+            .rented:hover rect {
+                fill: rgba(0, 170, 255, 0.15) !important;
+                stroke: #00aaff !important;
+            }
+
+        .not-rented {
+            fill: #yourNotRentedColor;
+            opacity: 0.25;
+            filter: grayscale(1);
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+            /* Скрываем иконки для неарендованных */
+            .not-rented g[id^="body"],
+            .not-rented g[id^="close"],
+            .not-rented [id^="Vector_"] {
+                display: none !important;
+            }
+        /* Стили для помещений */
+        g.rented {
+            cursor: pointer;
+        }
+
+            g.rented:hover rect {
+                fill: rgba(0, 170, 255, 0.15) !important;
+                stroke: #00aaff !important;
+            }
+
+        g.not-rented {
+            opacity: 0.25;
+            filter: grayscale(1);
+            pointer-events: none;
+            cursor: not-allowed;
+        }
         .search-panel {
             position: fixed;
             top: 0;
@@ -366,6 +595,7 @@
                 transition: all 0.3s ease;
             }
 
+
         .svg-disabled {
             opacity: 0.25;
             pointer-events: none;
@@ -377,6 +607,11 @@
             transform: none !important;
             filter: none !important;
             cursor: not-allowed !important;
+        }
+
+      
+        svg g[id^="Store-"]:not(.svg-disabled) {
+            cursor: pointer;
         }
 
    
@@ -621,28 +856,11 @@
         }
 
     </style>
+   
 </head>
-<body>
+<body class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
 
-    <nav class="sidebar">
-        <div id="search-panel" class="search-panel hidden">
-            <input type="text" id="search-input" placeholder="Введите запрос..." onkeydown="handleKeyPress(event)">
-            <div id="search-results" class="search-results"></div>
-        </div>
-
-
-        <ul>
-            <li onclick="showSection('home')"><i class="fas fa-bars"></i> <span>Главная</span></li>
-            <li @onclick="NavigateToReg"><i class="fas fa-id-card"></i> <span>Регистрация</span></li>
-            @*   <li><i class="fas fa-user"></i> <span>Профиль</span></li> *@
-            <!-- Вставьте в <ul> меню: -->
-            <li @onclick="NavigateToLogin"><i class="fas fa-sign-in-alt"></i> <span>Вход</span></li>
-
-            <li onclick="toggleSearchPanel()"><i class="fas fa-search"></i> <span>Поиск</span></li>
-
-            <li onclick="showSection('mall-map')"><i class="fas fa-map-marked-alt"></i> <span>Карта</span></li>
-        </ul>
-    </nav>
+  
 
     <div id="home" class="screen">
         <div class="welcome-text">Добро пожаловать в Сити Центр</div>
@@ -652,17 +870,14 @@
                 <span @onclick="NavigateToShops">Магазины</span>
             </div>
             <div class="block">
-                <span>Кафе и рестораны</span>
+                <span @onclick="NavigateToFood">Кафе и рестораны</span>
             </div>
             <div class="block">
-                <span>Мероприятия</span>
-            </div>
-            <div class="block">
-                <span>Сервисы и услуги</span>
+                <span @onclick="NavigateToServices">Сервисы и услуги</span>
             </div>
         </div>
         <!-- Стрелка вниз -->
-        <div class="scroll-down" onclick="scrollToMap()">
+        <div class="scroll-down" @onclick="ScrollToMap">
             <i class="fas fa-chevron-down"></i>
         </div>
 
@@ -684,47 +899,7 @@
 
     </div>
 
-    <!-- Скрипт для переключения -->
-    <script>
-        function toggleSearchPanel() {
-            const panel = document.getElementById('search-panel');
-            panel.classList.toggle('hidden');
-        }
-
-        function performSearch() {
-            const query = document.getElementById('search-input').value;
-            alert("Поиск: " + query);
-            document.getElementById('search-panel').classList.add('hidden');
-        }
-
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                performSearch();
-            }
-        }
-        function showSection(sectionId) {
-            document.querySelectorAll('.screen, .login-screen, .register-screen').forEach(el => el.classList.add('hidden'));
-            const target = document.getElementById(sectionId);
-            if (target) target.classList.remove('hidden');
-        }
-
-        function scrollToMap() {
-            const map = document.getElementById('mall-map');
-            if (map) {
-                map.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
-        document.addEventListener('click', function (event) {
-            const panel = document.getElementById('search-panel');
-            if (!panel.contains(event.target) && !event.target.closest('.sidebar')) {
-                panel.classList.add('hidden');
-            }
-        });
-
-    </script>
-
+  
 
 
     <!-- Экран входа -->
@@ -790,7 +965,54 @@
         </div>
     </div>
 </footer>
+<script>
 
+    function toggleSearchPanel() {
+        const panel = document.getElementById('search-panel');
+        panel.classList.toggle('hidden');
+    }
+
+    function performSearch() {
+        const query = document.getElementById('search-input').value;
+        alert("Поиск: " + query);
+        document.getElementById('search-panel').classList.add('hidden');
+    }
+
+
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            performSearch();
+        }
+    }
+    function showSection(sectionId) {
+        document.querySelectorAll('.screen, .login-screen, .register-screen').forEach(el => el.classList.add('hidden'));
+        const target = document.getElementById(sectionId);
+        if (target) target.classList.remove('hidden');
+    }
+
+    function scrollToMap() {
+        const map = document.getElementById('mall-map');
+        if (map) {
+            map.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+    function scrollToMap() {
+        const map = document.getElementById('mall-map');
+        if (map) {
+            map.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    document.addEventListener('click', function (event) {
+        const panel = document.getElementById('search-panel');
+        if (!panel.contains(event.target) && !event.target.closest('.sidebar')) {
+            panel.classList.add('hidden');
+        }
+    });
+    // В скриптах
+    document.addEventListener('scroll', handler, { passive: true });
+
+</script>
 </html>
 
 @code {
@@ -804,6 +1026,11 @@
 
     private List<string> floors = new() { "Этаж 1", "Этаж 2", "Этаж 3", "Этаж 4" };
 
+
+    private void ToggleSearchPanel()
+    {
+        JS.InvokeVoidAsync("toggleSearchPanel");
+    }
     private async void Prev()
     {
         currentIndex = (currentIndex - 1 + floors.Count) % floors.Count;
@@ -830,6 +1057,7 @@
     {
         if (firstRender)
         {
+            dotNetRef?.Dispose();
             dotNetRef = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("mapRent.setupClickHandler", dotNetRef);
         }
@@ -841,47 +1069,88 @@
     private async Task LoadSvgForFloor(int floor)
     {
         SelectedRoom = null;
-
         string path = $"wwwroot/images/Frame{floor}.svg";
         SvgContent = await File.ReadAllTextAsync(path);
 
-        var всеИзБд = await Db.Помещенияs.ToListAsync();
-        var доступные = всеИзБд.Where(p => p.ДоступноДляАренды && p.Этаж == floor).ToList();
-        Доступные = доступные.ToDictionary(p => p.Расположение, p => p);
+        var всеПомещения = await Db.Помещенияs.ToListAsync();
+        var svgIds = Regex.Matches(SvgContent, @"id=""(Store-[\w-]+)""")
+                     .Select(m => m.Groups[1].Value)
+                     .Distinct()
+                     .ToList();
 
-        var svgIds = Regex.Matches(SvgContent, "id=\"(Store-[\\w-]+)\"")
-                          .Select(m => m.Groups[1].Value)
-                          .Distinct()
-                          .ToList();
         foreach (var id in svgIds)
         {
-            var помещение = всеИзБд.FirstOrDefault(p => p.Расположение == id);
+            var помещение = всеПомещения.FirstOrDefault(p => p.Расположение == id);
 
-            if (помещение == null || помещение.ДоступноДляАренды == false)
+            // Паттерн для поиска групп с иконками (body X, close X и т.д.)
+            var iconPattern = $@"<g[^>]+id=""{id}""[^>]*>.*?<g\s+id=""(body|close)[^""]*"".*?</g>";
+
+            if (помещение != null && !помещение.ДоступноДляАренды)
             {
-                // отключаем
-                SvgContent = Regex.Replace(
-                  SvgContent,
-                  $"<g([^>]*?)id=\"{id}\"",
-                  match =>
-                  {
-                      var gTag = match.Value;
-                      gTag = Regex.Replace(gTag, @"class\s*=\s*""[^""]*""", "");
-                      return Regex.Replace(gTag, "<g", "<g class=\"svg-disabled\"");
-                  });
-            }
-            else if (!string.IsNullOrWhiteSpace(помещение.СсылкаНаМагазин)) // если у арендатора есть сайт
-            {
-                // оборачиваем в <a href="...">
+                // Арендованные помещения
+                string fullUrl = GetFullUrl(помещение.СсылкаНаМагазин);
+
                 SvgContent = Regex.Replace(
                     SvgContent,
-                    $"(<g[^>]*id=\"{id}\"[^>]*>.*?</g>)",
-                    $"<a href=\"{помещение.СсылкаНаМагазин}\" target=\"_blank\">$1</a>",
-                    RegexOptions.Singleline);
+                    $@"(<g[^>]*id=""{id}""[^>]*)",
+                    $"$1 class=\"rented\" onclick=\"window.open('{fullUrl}', '_blank')\"",
+                    RegexOptions.IgnoreCase);
+
+                // Оставляем иконку как есть (она будет видна благодаря CSS)
+            }
+            else
+            {
+                // Свободные помещения - удаляем группу с иконкой
+                SvgContent = Regex.Replace(
+                    SvgContent,
+                    iconPattern,
+                    match =>
+                    {
+                        // Сохраняем основную группу Store-XXX, но удаляем внутреннюю группу с иконкой
+                        var storeGroup = match.Value;
+                        return storeGroup.Replace(match.Groups[1].Value, ""); // Удаляем группу с иконкой
+                    },
+                    RegexOptions.Singleline | RegexOptions.IgnoreCase);
+
+                // Добавляем класс для помещения
+                SvgContent = Regex.Replace(
+                    SvgContent,
+                    $@"(<g[^>]*id=""{id}""[^>]*)",
+                    "$1 class=\"not-rented\"",
+                    RegexOptions.IgnoreCase);
             }
         }
 
         StateHasChanged();
+    }
+    private async Task ScrollToMap()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("scrollToMap");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка прокрутки: {ex.Message}");
+        }
+    }
+
+    private string GetFullUrl(string? url)
+    {
+        url = url?.Trim(); // Убираем пробелы в начале и конце
+
+        if (string.IsNullOrWhiteSpace(url))
+            return "#";
+
+        // Удаляем возможные протоколы и слеши в начале
+        url = Regex.Replace(url, "^https?://", "", RegexOptions.IgnoreCase);
+        url = url.TrimStart('/');
+
+        // Если URL не содержит точку (значит это не домен), возвращаем #
+        if (!url.Contains('.'))
+            return "#";
+
+        return $"https://{url}";
     }
     protected override async Task OnInitializedAsync()
     {
@@ -906,5 +1175,15 @@
     private void NavigateToShops()
     {
         Navigation.NavigateTo("/shops");
+    }
+
+    private void NavigateToServices()
+    {
+        Navigation.NavigateTo("/services");
+    }
+
+    private void NavigateToFood()
+    {
+        Navigation.NavigateTo("/food");
     }
 }

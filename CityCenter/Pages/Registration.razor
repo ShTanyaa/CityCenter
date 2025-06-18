@@ -7,7 +7,104 @@
 @inject AppDbContext Db
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
+@using System.Net
+@using System.Net.Mail
+@inject ThemeService ThemeService
+<!DOCTYPE html>
+<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
+<head>
 <style>
+        /* Светлая тема */
+        .light-theme body {
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0) !important;
+            color: #333 !important;
+        }
+
+        .light-theme .sidebar {
+            background: rgba(240, 240, 240, 0.9) !important;
+        }
+
+            .light-theme .sidebar ul li {
+                color: #333 !important;
+            }
+
+                .light-theme .sidebar ul li:hover {
+                    background: rgba(0, 0, 0, 0.1) !important;
+                }
+
+        .light-theme .block {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(230, 230, 230, 0.8)) !important;
+            color: #333 !important;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.1) !important;
+        }
+
+            .light-theme .block:hover {
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(200, 230, 255, 0.6)) !important;
+                box-shadow: 0 0 20px rgba(0, 120, 215, 0.4) !important;
+            }
+
+        .light-theme .welcome-text {
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2) !important;
+            color: #333 !important;
+        }
+
+        .light-theme .confirmation-input {
+            background-color: #f0f0f0 !important;
+            color: #333 !important;
+            border: 1px solid #ddd !important;
+        }
+
+        .light-theme .login-link {
+            color: #666 !important;
+        }
+
+            .light-theme .login-link:hover {
+                color: #333 !important;
+            }
+        .light-theme .scroll-down {
+            color: #0078d7 !important;
+        }
+
+        .light-theme .back-button.top-left {
+            color: #333 !important;
+        }
+
+        .light-theme .login-screen {
+            background: rgba(240, 240, 240, 0.9) !important;
+        }
+
+        /* Формы входа */
+        .light-theme .login-box {
+            background: linear-gradient(135deg, rgba(240, 240, 240, 0.95), rgba(230, 230, 230, 0.95)) !important;
+            color: #333 !important;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .light-theme .login-input {
+            background-color: #f0f0f0 !important;
+            color: #333 !important;
+            border: 1px solid #ddd !important;
+        }
+
+            .light-theme .login-input:focus {
+                box-shadow: 0 0 10px rgba(0, 120, 215, 0.5) !important;
+            }
+
+        .light-theme .back-button.inside {
+            color: #666 !important;
+        }
+
+            .light-theme .back-button.inside:hover {
+                color: #333 !important;
+            }
+
+        .light-theme .login-link {
+            color: #666 !important;
+        }
+
+            .light-theme .login-link:hover {
+                color: #333 !important;
+            }
     body {
         display: flex;
         flex-direction: column;
@@ -217,9 +314,9 @@
     }
 
     /* @@keyframes fadeIn {
-                    from { opacity: 0; transform: scale(0.95); }
-                    to { opacity: 1; transform: scale(1); }
-                } */
+                from { opacity: 0; transform: scale(0.95); }
+                to { opacity: 1; transform: scale(1); }
+            } */
 
 
     .login-box {
@@ -227,8 +324,7 @@
         background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(40, 40, 40, 0.95));
         padding: 100px 120px;
         border-radius: 24px;
-        border: 1px solid #e0e0e0;
-        box-shadow: 0 0 0 2px rgba(255,255,255,0.8), 0 0 0 4px rgba(0,170,255,0.2), 0 0 40px rgba(0,0,0,0.1);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
         min-width: 600px;
         max-width: 700px;
         width: 100%;
@@ -237,15 +333,6 @@
         transition: transform 0.3s ease;
     }
 
-        .login-box::after {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 28px; /* чуть больше, чем у родителя */
-            background: linear-gradient(135deg, rgba(0,170,255,0.3), rgba(100,200,255,0.1));
-            z-index: -1;
-            pointer-events: none;
-        }
         .login-box h2 {
             margin-bottom: 30px;
             font-size: 2.8rem;
@@ -334,6 +421,45 @@
             color: #fff;
         }
 
+        .confirmation-code-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .confirmation-input {
+            display: block;
+            margin: 0 auto;
+            padding: 22px;
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.3rem;
+            font-family: 'Poppins', sans-serif;
+            background-color: #1e1e1e;
+            color: #fff;
+            transition: box-shadow 0.3s ease;
+        }
+
+            .confirmation-input:focus {
+                outline: none;
+                box-shadow: 0 0 10px #00aaff;
+            }
+
+        .login-link {
+            color: #aaa;
+            font-size: 1.2rem;
+            text-decoration: underline;
+            cursor: pointer;
+            transition: color 0.3s;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+            .login-link:hover {
+                color: #fff;
+            }
 
     .scroll-down {
         margin-top: 40px;
@@ -358,6 +484,8 @@
     }
 
 </style>
+</head>
+<body class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
 <div class="login-screen">
     <div class="login-box">
         <button class="back-button inside" @onclick="GoHome">← Назад</button>
@@ -369,24 +497,45 @@
             <p style="color:@(IsError ? "red" : "green")">@Message</p>
         }
 
-        <EditForm Model="@user" OnValidSubmit="HandleRegister">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+        @if (!ShowConfirmationCode)
+        {
+            <EditForm Model="@user" OnValidSubmit="HandleRegister">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
-            <InputText @bind-Value="user.Фио" placeholder="ФИО" class="login-input" />
-            <InputText @bind-Value="user.Email" placeholder="Email" class="login-input" />
-            <InputText @bind-Value="user.Телефон" placeholder="Телефон" class="login-input" />
-            <InputText @bind-Value="Password" type="password" placeholder="Пароль" class="login-input" />
-            <InputText @bind-Value="PasswordRepeat" type="password" placeholder="Повторите пароль" class="login-input" />
+                <InputText @bind-Value="user.Фио" placeholder="ФИО" class="login-input" />
+                <InputText @bind-Value="user.Email" placeholder="Email" class="login-input" />
+                <InputText @bind-Value="user.Телефон" placeholder="Телефон" class="login-input" />
+                <InputText @bind-Value="Password" type="password" placeholder="Пароль" class="login-input" />
+                <InputText @bind-Value="PasswordRepeat" type="password" placeholder="Повторите пароль" class="login-input" />
 
-            <button type="submit" class="login-button">Зарегистрироваться</button>
-        </EditForm>
+                <button type="submit" class="login-button">Зарегистрироваться</button>
+            </EditForm>
 
-        <div class="login-links">
-            <a class="login-link" href="/login">Уже есть аккаунт? Войти</a>
-        </div>
+            <div class="login-links">
+                <a class="login-link" href="/login">Уже есть аккаунт? Войти</a>
+            </div>
+        }
+        else
+        {
+                <div class="confirmation-code-container">
+                    <p>На адрес <strong>@user.Email</strong> отправлен код подтверждения.</p>
+                    <p>Введите его ниже:</p>
+
+                    <InputText @bind-Value="ConfirmationCode"
+                               placeholder="Код подтверждения"
+                               class="login-input"
+                               maxlength="6" />
+
+                    <button class="login-button" @onclick="VerifyConfirmationCode">Подтвердить</button>
+
+                    <a class="login-link" @onclick="ResendConfirmationCode">Не получили код? Отправить повторно</a>
+                </div>
+        }
     </div>
 </div>
+</body>
+</html>
 
 @code {
     private Пользователи user = new();
@@ -394,6 +543,43 @@
     private string PasswordRepeat;
     private string Message;
     private bool IsError;
+    private bool ShowConfirmationCode = false;
+    private string ConfirmationCode;
+    private string GeneratedConfirmationCode;
+    private string TempPasswordHash;
+
+    // Генерация случайного 6-значного кода подтверждения
+    private string GenerateConfirmationCode()
+    {
+        Random random = new Random();
+        string code = random.Next(100000, 999999).ToString();
+        return code;
+    }
+
+    // Отправка письма с кодом подтверждения
+    private void SendConfirmationEmail(string to, string confirmationCode)
+    {
+        try
+        {
+            MailMessage mail = new MailMessage();
+            SmtpClient smtp = new SmtpClient("smtp.mail.ru");
+
+            mail.From = new MailAddress("tanya_shumkova@list.ru");
+            mail.To.Add(to);
+            mail.Subject = "Подтверждение email для регистрации на сайте СитиЦентра";
+            mail.Body = $"Ваш код подтверждения: {confirmationCode}";
+
+            smtp.Port = 587;
+            smtp.Credentials = new NetworkCredential("tanya_shumkova@list.ru", "VmH9E9UFrX8msBtSBYgu");
+            smtp.EnableSsl = true;
+
+            smtp.Send(mail);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Ошибка отправки письма: {ex.Message}");
+        }
+    }
 
     private async Task HandleRegister()
     {
@@ -422,35 +608,119 @@
             return;
         }
 
-        user.Пароль = HashPassword(Password);
-        user.IdРоли = 2;
-        if (string.IsNullOrWhiteSpace(user.Телефон)) user.Телефон = null;
+        // Сохраняем хеш пароля временно
+        TempPasswordHash = HashPassword(Password);
 
-        Db.Пользователиs.Add(user);
-        await Db.SaveChangesAsync();
-        await Db.Entry(user).ReloadAsync(); // чтобы быть уверенным
-
-        if (user.IdРоли == 2)
+        // Генерируем и отправляем код подтверждения
+        GeneratedConfirmationCode = GenerateConfirmationCode();
+        try
         {
-            var арендатор = new Арендаторы
-                {
-                    Имя = user.Фио,
-                    КонтактнаяИнформация = user.Телефон ?? "Не указано",
-                    Статус = "Новый",
-                    НомерДоговора = $"DOC-{Db.Пользователиs.Count() + 1:D3}",
-                    IdПользователя = user.IdПользователя
-                };
-
-            Db.Арендаторыs.Add(арендатор);
-            await Db.SaveChangesAsync();
+            SendConfirmationEmail(user.Email, GeneratedConfirmationCode);
+            ShowConfirmationCode = true;
+            Message = "Код подтверждения отправлен на вашу почту";
+            IsError = false;
         }
-
-
-        Message = "Регистрация прошла успешно!";
-        IsError = false;
-        NavigationManager.NavigateTo("/login");
+        catch (Exception ex)
+        {
+            Message = $"Ошибка отправки кода подтверждения: {ex.Message}";
+            IsError = true;
+        }
     }
 
+    private async Task VerifyConfirmationCode()
+    {
+        try
+        {
+            // Проверка кода подтверждения
+            if (string.IsNullOrWhiteSpace(ConfirmationCode) || ConfirmationCode.Length != 6)
+            {
+                Message = "Введите 6-значный код подтверждения";
+                IsError = true;
+                return;
+            }
+
+            if (ConfirmationCode != GeneratedConfirmationCode)
+            {
+                Message = "Неверный код подтверждения";
+                IsError = true;
+                return;
+            }
+
+            // Сохранение пользователя
+            user.Пароль = TempPasswordHash;
+            user.IdРоли = 2;
+            if (string.IsNullOrWhiteSpace(user.Телефон)) user.Телефон = null;
+
+            Db.Пользователиs.Add(user);
+            await Db.SaveChangesAsync(); // Сохраняем пользователя
+
+            Console.WriteLine($"Пользователь сохранен, ID: {user.IdПользователя}"); // Логирование
+
+            // Создание арендатора
+            if (user.IdРоли == 2)
+            {
+                var арендатор = new Арендаторы
+                    {
+                        Имя = user.Фио,
+                        КонтактнаяИнформация = user.Телефон ?? "Не указано",
+                        Статус = "Новый",
+                        НомерДоговора = $"DOC-{Db.Пользователиs.Count() + 1:D3}",
+                        IdПользователя = user.IdПользователя
+                    };
+
+                Db.Арендаторыs.Add(арендатор);
+                await Db.SaveChangesAsync(); // Явно сохраняем арендатора
+
+                Console.WriteLine($"Арендатор сохранен, ID пользователя: {арендатор.IdПользователя}"); // Логирование
+            }
+
+            Message = "Регистрация прошла успешно!";
+            IsError = false;
+
+            // Добавляем небольшую задержку перед редиректом
+            await Task.Delay(1500);
+            NavigationManager.NavigateTo("/login");
+        }
+        catch (Exception ex)
+        {
+            // Логируем полную ошибку
+            Console.WriteLine($"Ошибка при регистрации: {ex.ToString()}");
+
+            Message = $"Произошла ошибка: {ex.Message}";
+            IsError = true;
+
+            // Можно добавить откат изменений при ошибке
+            try
+            {
+                if (user?.IdПользователя > 0)
+                {
+                    var userToRemove = await Db.Пользователиs.FindAsync(user.IdПользователя);
+                    if (userToRemove != null)
+                    {
+                        Db.Пользователиs.Remove(userToRemove);
+                        await Db.SaveChangesAsync();
+                    }
+                }
+            }
+            catch { } // Игнорируем ошибки отката
+        }
+    }
+
+    private async Task ResendConfirmationCode()
+    {
+        GeneratedConfirmationCode = GenerateConfirmationCode();
+        try
+        {
+            SendConfirmationEmail(user.Email, GeneratedConfirmationCode);
+            Message = "Новый код подтверждения отправлен на вашу почту";
+            IsError = false;
+        }
+        catch (Exception ex)
+        {
+            Message = $"Ошибка отправки кода подтверждения: {ex.Message}";
+            IsError = true;
+        }
+    }
 
     private string HashPassword(string password)
     {

@@ -5,14 +5,20 @@
 @inject AppDbContext Db
 @inject NavigationManager NavigationManager
 
-
+@inject ThemeService ThemeService
+<!DOCTYPE html>
+<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
+<head>
 <style>
+    /* Основные стили */
     body {
         font-family: 'Poppins', sans-serif;
         background: linear-gradient(135deg, #0a0a0a, #111);
         color: #fff;
         margin: 0;
         padding: 0;
+        min-height: 100vh;
+        transition: all 0.3s ease;
     }
 
     .tenant-profile {
@@ -73,8 +79,48 @@
         .btn:hover {
             background-color: #0088cc;
         }
-</style>
 
+    /* Светлая тема */
+    body.light-theme {
+        background: linear-gradient(135deg, #f5f7fa, #e4e8eb);
+        color: #333;
+    }
+
+    .light-theme .tenant-profile {
+        color: #333;
+    }
+
+    .light-theme .tenant-name {
+        text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+        color: #222;
+    }
+
+    .light-theme .card {
+        background: linear-gradient(135deg, rgba(245, 245, 245, 0.95), rgba(255, 255, 255, 0.95));
+        color: #333;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e0e0e0;
+    }
+
+        .light-theme .card:hover {
+            box-shadow: 0 0 30px rgba(0, 120, 215, 0.3);
+        }
+
+    .light-theme .btn {
+        background-color: #0078d7;
+        color: white;
+    }
+
+        .light-theme .btn:hover {
+            background-color: #0066cc;
+        }
+
+    .light-theme .section-title {
+        color: #222;
+    }
+</style>
+</head>
+<body class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
 <div class="tenant-profile">
     <div class="tenant-name">@FullName</div>
 
@@ -175,6 +221,8 @@
         🗺 Смотреть на карте
     </button>
 </div>
+</body>
+</html>
 
 @code {
     [Parameter] public int UserId { get; set; }

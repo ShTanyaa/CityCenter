@@ -3,6 +3,7 @@
 @using CityCenter.Data
 @inject AppDbContext Db
 @inject IJSRuntime JS
+@inject ThemeService ThemeService
 
 
 <style>
@@ -110,9 +111,9 @@
     }
 </style>
 
-<div class="welcome-screen @(isLightTheme ? "light-theme" : "")">
+<div class="welcome-screen @(ThemeService.IsLightTheme ? "light-theme" : "")">
     <button class="theme-toggle" @onclick="ToggleTheme">
-        @(isLightTheme ? "Тёмная тема" : "Светлая тема")
+        @(ThemeService.IsLightTheme ? "Тёмная тема" : "Светлая тема")
     </button>
 
     <h1 class="welcome-title">Добро пожаловать в Сити Центр!</h1>
@@ -134,7 +135,7 @@
 
     private void ToggleTheme()
     {
-        isLightTheme = !isLightTheme;
+        ThemeService.IsLightTheme = !ThemeService.IsLightTheme;
     }
 
     private void NavigateToVisitors()

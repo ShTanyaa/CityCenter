@@ -6,15 +6,38 @@
 @inject NavigationManager NavigationManager
 @inject IWebHostEnvironment Env
 @inject AuthenticationStateProvider AuthProvider
-
+@inject IJSRuntime JSRuntime
+@inject ThemeService ThemeService
+<!DOCTYPE html>
+<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
+<head>
 <style>
+    /* Основные стили (тёмная тема по умолчанию) */
     body {
         font-family: 'Poppins', sans-serif;
         background: linear-gradient(135deg, #0a0a0a, #111);
         color: #fff;
         margin: 0;
         padding: 0;
+        min-height: 100vh;
+        transition: all 0.3s ease;
     }
+
+    .back-arrow {
+        position: absolute;
+        top: 30px;
+        left: 30px;
+        font-size: 2rem;
+        cursor: pointer;
+        color: #00aaff;
+        transition: transform 0.2s ease;
+        z-index: 10;
+    }
+
+        .back-arrow:hover {
+            transform: scale(1.2);
+            color: #0088cc;
+        }
 
     .submit-container {
         display: flex;
@@ -50,6 +73,7 @@
         color: white;
         margin-top: 15px;
         margin-bottom: 20px;
+        transition: all 0.3s ease;
     }
 
         .form-control:focus {
@@ -90,9 +114,78 @@
         margin-top: 15px;
         font-size: 1rem;
     }
-</style>
 
+    select.form-control {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 20px;
+    }
+
+    /* Светлая тема */
+    body.light-theme {
+        background: linear-gradient(135deg, #f5f7fa, #e4e8eb);
+        color: #333;
+    }
+
+    .light-theme .back-arrow {
+        color: #0078d7;
+    }
+
+        .light-theme .back-arrow:hover {
+            color: #005fa3;
+        }
+
+    .light-theme .card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 245, 245, 0.95));
+        color: #333;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e0e0e0;
+    }
+
+        .light-theme .card:hover {
+            box-shadow: 0 0 30px rgba(0, 120, 215, 0.3);
+        }
+
+    .light-theme .form-control {
+        background-color: #fff;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+
+        .light-theme .form-control:focus {
+            box-shadow: 0 0 10px rgba(0, 120, 215, 0.5);
+        }
+
+    .light-theme .btn {
+        background-color: #0078d7;
+        color: white;
+    }
+
+        .light-theme .btn:hover {
+            background-color: #0066cc;
+        }
+
+    .light-theme h2 {
+        color: #222;
+        text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .light-theme select.form-control {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23333'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    }
+
+    .light-theme .message {
+        color: #28a745;
+    }
+</style>
+</head>
+<body class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
 <div class="submit-container">
+    <div class="back-arrow" @onclick="GoBack">←</div>
     <h2>Оплата аренды</h2>
 
     @if (room == null)
@@ -114,10 +207,17 @@
             {
                 <img src="@ImagePreview" class="preview" />
             }
-            <input class="form-control" placeholder="Цель аренды" @bind="Цель" required />
+
+            <select class="form-control" @bind="IdДеятельности">
+                <option value="">-- Выберите вид деятельности --</option>
+                @foreach (var activity in Activities)
+                {
+                    <option value="@activity.IdНазначения">@activity.Название</option>
+                }
+            </select>
+
             <input class="form-control" type="date" @bind="ДатаНачала" />
             <input class="form-control" type="date" @bind="ДатаОкончания" />
-
 
             <textarea class="form-control" rows="3" placeholder="Комментарий к оплате" @bind="Комментарий"></textarea>
             <button class="btn" @onclick="SubmitApplication">📤 Отправить заявку</button>
@@ -129,14 +229,17 @@
         </div>
     }
 </div>
+</body>
+</html>
 
 @code {
     [Parameter] public int roomId { get; set; }
     [Parameter] public int userId { get; set; }
 
-    private string? Цель;
+    private int? IdДеятельности;
     private DateTime ДатаНачала = DateTime.Today;
     private DateTime ДатаОкончания = DateTime.Today.AddMonths(1);
+    private List<НазначенияПомещений> Activities = new();
 
     private Помещения? room;
     private IBrowserFile? UploadedFile;
@@ -144,12 +247,11 @@
     private string? Комментарий;
     private string? Message;
 
-
     protected override async Task OnInitializedAsync()
     {
         room = await Db.Помещенияs.FindAsync(roomId);
+        Activities = await Db.НазначенияПомещенийs.ToListAsync();
     }
-
 
     private async Task HandleFileUpload(InputFileChangeEventArgs e)
     {
@@ -165,7 +267,7 @@
     {
         try
         {
-            if (UploadedFile == null || userId == 0 || string.IsNullOrWhiteSpace(Цель))
+            if (UploadedFile == null || userId == 0 || !IdДеятельности.HasValue)
             {
                 Message = "❗ Заполните все поля и загрузите скрин оплаты.";
                 return;
@@ -187,6 +289,14 @@
                 return;
             }
 
+            // Получаем название выбранного вида деятельности
+            var selectedActivity = Activities.FirstOrDefault(a => a.IdНазначения == IdДеятельности);
+            if (selectedActivity == null)
+            {
+                Message = "❗ Выбранный вид деятельности не найден";
+                return;
+            }
+
             // Сохраняем заявку
             var заявка = new ЗаявкаНаАренду
                 {
@@ -194,33 +304,14 @@
                     ID_Помещения = roomId,
                     ДатаЗаявки = DateTime.Now,
                     ФотоОплаты = "/uploads/" + fileName,
-                    Комментарий = Комментарий ?? "",
-                    Статус = "В обработке" // сразу принимается
+                    Комментарий = $"Вид деятельности: {selectedActivity.Название}\n{Комментарий ?? ""}",
+                    Статус = "В обработке"
                 };
 
             Db.ЗаявкиНаАренду.Add(заявка);
-
-            // // Сохраняем аренду
-            // var аренда = new Аренда
-            //     {
-            //         IdАрендатора = арендатор.IdАрендатора,
-            //         IdПомещения = roomId,
-            //         Цель = Цель!,
-            //         ДатаНачала = ДатаНачала,
-            //         ДатаОкончания = ДатаОкончания,
-            //         ДатаПоследнегоИзменения = null
-            //     };
-
-            // Db.Арендаs.Add(аренда);
-
-            // Обновляем статус помещения
-            var помещение = await Db.Помещенияs.FindAsync(roomId);
-            if (помещение != null)
-                помещение.ДоступноДляАренды = false;
-
             await Db.SaveChangesAsync();
 
-            Message = "✅ Заявка и аренда успешно оформлены!";
+            Message = "✅ Заявка успешно отправлена на рассмотрение! После подтверждения администратором помещение будет добавлено в ваш список арендованных.";
         }
         catch (Exception ex)
         {
@@ -229,6 +320,8 @@
         }
     }
 
-
-
+    private async Task GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("history.back");
+    }
 }

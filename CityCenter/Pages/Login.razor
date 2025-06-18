@@ -7,7 +7,89 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 @inject AppDbContext Db
+@inject ThemeService ThemeService
+<!DOCTYPE html>
+<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
+<head>
 <style>
+        /* Светлая тема */
+        .light-theme body {
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0) !important;
+            color: #333 !important;
+        }
+
+        .light-theme .sidebar {
+            background: rgba(240, 240, 240, 0.9) !important;
+        }
+
+            .light-theme .sidebar ul li {
+                color: #333 !important;
+            }
+
+                .light-theme .sidebar ul li:hover {
+                    background: rgba(0, 0, 0, 0.1) !important;
+                }
+
+        .light-theme .block {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(230, 230, 230, 0.8)) !important;
+            color: #333 !important;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.1) !important;
+        }
+
+            .light-theme .block:hover {
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(200, 230, 255, 0.6)) !important;
+                box-shadow: 0 0 20px rgba(0, 120, 215, 0.4) !important;
+            }
+
+        .light-theme .welcome-text {
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2) !important;
+            color: #333 !important;
+        }
+
+        .light-theme .scroll-down {
+            color: #0078d7 !important;
+        }
+
+        .light-theme .back-button.top-left {
+            color: #333 !important;
+        }
+
+        .light-theme .login-screen {
+            background: rgba(240, 240, 240, 0.9) !important;
+        }
+
+        /* Формы входа */
+        .light-theme .login-box {
+            background: linear-gradient(135deg, rgba(240, 240, 240, 0.95), rgba(230, 230, 230, 0.95)) !important;
+            color: #333 !important;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .light-theme .login-input {
+            background-color: #f0f0f0 !important;
+            color: #333 !important;
+            border: 1px solid #ddd !important;
+        }
+
+            .light-theme .login-input:focus {
+                box-shadow: 0 0 10px rgba(0, 120, 215, 0.5) !important;
+            }
+
+        .light-theme .back-button.inside {
+            color: #666 !important;
+        }
+
+            .light-theme .back-button.inside:hover {
+                color: #333 !important;
+            }
+
+        .light-theme .login-link {
+            color: #666 !important;
+        }
+
+            .light-theme .login-link:hover {
+                color: #333 !important;
+            }
     body {
         display: flex;
         flex-direction: column;
@@ -348,6 +430,8 @@
     }
 
 </style>
+</head>
+<body class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
 <div class="login-screen">
     <div class="login-box">
         <button class="back-button inside" @onclick="GoHome">← Назад</button>
@@ -369,6 +453,8 @@
         </div>
     </div>
 </div>
+</body>
+</html>
 
 @code {
     private string Email { get; set; } = string.Empty;
