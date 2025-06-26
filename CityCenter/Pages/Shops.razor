@@ -8,177 +8,182 @@
 <!DOCTYPE html>
 <html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
 <head>
-<style>
-    .shops-screen {
-        padding: 60px 30px;
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #0a0a0a, #111);
-        color: white;
-        min-height: 100vh; /* Занимает всю высоту экрана */
-        width: 100%; /* Занимает всю ширину */
-        box-sizing: border-box; /* Учитывает padding в ширине */
-    }
-
-    .shops-title {
-        font-size: 3rem;
-        text-align: center;
-        margin-bottom: 40px;
-        color: #00aaff;
-        text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
-    }
-
-    .shops-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 30px;
-        max-width: 1300px;
-        margin: 0 auto;
-        padding-bottom: 60px; /* Добавляем отступ снизу */
-    }
-
-    .shop-card {
-        background: linear-gradient(135deg, #1b1b1b, #2a2a2a);
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.6);
-        transition: all 0.3s ease;
-        height: 100%; /* Занимает всю высоту */
-        display: flex;
-        flex-direction: column;
-    }
-
-        .shop-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 170, 255, 0.4);
+    <style>
+        .shops-screen {
+            padding: 60px 30px;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a, #111);
+            color: white;
+            min-height: 100vh; /* Занимает всю высоту экрана */
+            width: 100%; /* Занимает всю ширину */
+            box-sizing: border-box; /* Учитывает padding в ширине */
         }
 
-    .shop-card-img-container {
-        width: 100%;
-        height: 180px;
-        border-radius: 12px;
-        overflow: hidden;
-        margin-bottom: 15px;
-        position: relative;
-    }
-
-    .shop-card img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s ease;
-    }
-
-    .shop-card:hover img {
-        transform: scale(1.05);
-    }
-
-    .no-photo-placeholder {
-        height: 100%;
-        background: linear-gradient(135deg, #333, #444);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #aaa;
-        font-size: 1rem;
-    }
-
-    .shop-card-content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .shop-card h3 {
-        margin: 0 0 10px 0;
-        font-size: 1.4rem;
-        color: #fff;
-    }
-
-    .shop-card p {
-        margin: 5px 0;
-        color: #ccc;
-        font-size: 0.95rem;
-    }
-
-    .shop-card-link {
-        display: inline-block;
-        margin-top: auto; /* Прижимаем кнопку к низу */
-        padding: 10px 16px;
-        background-color: #00aaff;
-        color: white;
-        text-decoration: none;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        text-align: center;
-        font-weight: 500;
-    }
-
-        .shop-card-link:hover {
-            background-color: #0088cc;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        .shops-title {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #00aaff;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
         }
 
-    /* Для светлой темы */
-    .light-theme .shops-screen {
-        background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
-    }
-
-    .light-theme .shop-card {
-        background: linear-gradient(135deg, #ffffff, #f5f5f5);
-        box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
-
-        .light-theme .shop-card h3 {
-            color: #333;
+        .shops-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding-bottom: 60px; /* Добавляем отступ снизу */
         }
 
-        .light-theme .shop-card p {
-            color: #666;
+        .shop-card {
+            background: linear-gradient(135deg, #1b1b1b, #2a2a2a);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.6);
+            transition: all 0.3s ease;
+            height: 100%; /* Занимает всю высоту */
+            display: flex;
+            flex-direction: column;
         }
 
-    .light-theme .no-photo-placeholder {
-        background: linear-gradient(135deg, #e0e0e0, #f0f0f0);
-        color: #888;
-    }
-</style>
+            .shop-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(0, 170, 255, 0.4);
+            }
+
+        .shop-card-img-container {
+            width: 100%;
+            height: 180px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .shop-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .shop-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .no-photo-placeholder {
+            height: 100%;
+            background: linear-gradient(135deg, #333, #444);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-size: 1rem;
+        }
+
+        .shop-card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .shop-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.4rem;
+            color: #fff;
+        }
+
+        .shop-card p {
+            margin: 5px 0;
+            color: #ccc;
+            font-size: 0.95rem;
+        }
+
+        .shop-card-link {
+            display: inline-block;
+            margin-top: auto; /* Прижимаем кнопку к низу */
+            padding: 10px 16px;
+            background-color: #00aaff;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+        }
+
+            .shop-card-link:hover {
+                background-color: #0088cc;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+        /* Для светлой темы */
+        .light-theme .shops-screen {
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+        }
+
+        .light-theme .shop-card {
+            background: linear-gradient(135deg, #ffffff, #f5f5f5);
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+            .light-theme .shop-card h3 {
+                color: #333;
+            }
+
+            .light-theme .shop-card p {
+                color: #666;
+            }
+
+        .light-theme .no-photo-placeholder {
+            background: linear-gradient(135deg, #e0e0e0, #f0f0f0);
+            color: #888;
+        }
+    </style>
 </head>
 <body class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
-<div class="shops-screen">
-    <h1 class="shops-title">Магазины и бутики</h1>
+    <div class="shops-screen">
+        <h1 class="shops-title">Магазины и бутики</h1>
 
-    <div class="shops-grid">
-        @foreach (var room in RoomsWithLinks)
-        {
-            <div class="shop-card">
-                <div class="shop-card-img-container">
-                    @if (!string.IsNullOrWhiteSpace(room.Фото))
-                    {
-                        <img src="@room.Фото" alt="Фото магазина" />
-                    }
-                    else
-                    {
-                        <div class="no-photo-placeholder">
-                            Фото отсутствует
-                        </div>
-                    }
+        <div class="shops-grid">
+            @foreach (var room in RoomsWithLinks)
+            {
+                <div class="shop-card">
+                    <div class="shop-card-img-container">
+                        @if (!string.IsNullOrWhiteSpace(room.СсылкаНаМагазин))
+                        {
+                            var siteUrl = GetFullUrl(room.СсылкаНаМагазин);
+                            var faviconUrl = $"https://www.google.com/s2/favicons?sz=128&domain_url={siteUrl}";
+                            <img src="@faviconUrl"
+                                 alt="Логотип сайта"
+                                 onerror="this.onerror=null; this.src='/images/placeholder.png';" />
+                        }
+                        else
+                        {
+                            <div class="no-photo-placeholder">
+                                Фото отсутствует
+                            </div>
+                        }
+                    </div>
+
+                    <div class="shop-card-content">
+                        <h3>@room.Название</h3>
+                        <p><strong>Этаж:</strong> @room.Этаж</p>
+
+                        @if (!string.IsNullOrWhiteSpace(room.СсылкаНаМагазин))
+                        {
+                            <a href="@GetFullUrl(room.СсылкаНаМагазин)" target="_blank" class="shop-card-link">
+                                🌐 Перейти на сайт
+                            </a>
+                        }
+                    </div>
                 </div>
+            }
+        </div>
 
-                <div class="shop-card-content">
-                    <h3>@room.Название</h3>
-                    <p><strong>Этаж:</strong> @room.Этаж</p>
-
-                    @if (!string.IsNullOrWhiteSpace(room.СсылкаНаМагазин))
-                    {
-                        <a href="@GetFullUrl(room.СсылкаНаМагазин)" target="_blank" class="shop-card-link">
-                            🌐 Перейти на сайт
-                        </a>
-                    }
-                </div>
-            </div>
-        }
     </div>
-</div>
 </body>
 </html>
 
@@ -189,8 +194,8 @@
     {
         RoomsWithLinks = await Db.Помещенияs
             .Where(p => !string.IsNullOrEmpty(p.СсылкаНаМагазин)
-                && p.IdНазначенияNavigation.Название != "Услуги"
-                && p.IdНазначенияNavigation.Название != "Кафе и рестораны")
+                && p.IdНазначенияNavigation.Название != "Офис"
+                && p.IdНазначенияNavigation.Название != "Еда")
             .Select(p => new ShopInfo
                 {
                     Название = p.Название,
@@ -221,4 +226,4 @@
         public string Фото { get; set; }
         public string? СсылкаНаМагазин { get; set; }
     }
-}
+} 

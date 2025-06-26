@@ -2,7 +2,7 @@
 {
     public class ThemeService
     {
-        private bool _isLightTheme = false;
+        private bool _isLightTheme = true; 
 
         public bool IsLightTheme
         {

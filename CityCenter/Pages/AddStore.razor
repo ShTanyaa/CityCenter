@@ -25,13 +25,17 @@
         cursor: pointer;
         color: #00aaff;
         transition: transform 0.2s ease;
+            margin-left: 20px; /* Добавляем отступ слева */
         z-index: 10;
     }
 
-        .back-arrow:hover {
-            transform: scale(1.2);
-            color: #0088cc;
-        }
+       
+     
+
+            .back-arrow:hover {
+                transform: scale(1.1);
+                color: #0088cc;
+            }
 
     /* Подсветка выбранного помещения */
     svg .selected {
@@ -185,6 +189,9 @@
         }
 
         body.light-theme {
+            width: 100vw;
+            max-width: 100%;
+
             background: linear-gradient(135deg, #f5f5f5, #e0e0e0) fixed;
             color: #333;
         }
@@ -286,7 +293,7 @@
             </div>
 
             <div class="form-group">
-                <label>Стоимость аренды (₽):</label>
+                <label>Стоимость аренды (₽/мес):</label>
                 <input type="number" step="0.01" @bind="RentPrice" required />
             </div>
 
@@ -334,7 +341,6 @@
     private int SelectedFloor = 1;
     private decimal Area;
     private decimal RentPrice;
-    private int? SelectedPurposeId;
     private string Description = "";
     private IBrowserFile? UploadedFile;
     private string SvgContent = "";
@@ -344,6 +350,7 @@
     private ElementReference RoomInfoRef;
 
     private HashSet<string> ExistingRoomIds = new();
+    private int SelectedPurposeId { get; set; } = 1;
 
     private string? SuccessMessage;
 
@@ -353,6 +360,12 @@
     {
         Purposes = await Db.НазначенияПомещенийs.ToListAsync();
         await LoadSvgForFloor(SelectedFloor);
+
+        // Устанавливаем значение по умолчанию (например, первое в списке)
+        if (Purposes != null && Purposes.Any())
+        {
+            SelectedPurposeId = Purposes.First().IdНазначения;
+        }
     }
 
     private async Task GoBack()
@@ -562,7 +575,7 @@
             RoomName = "";
             Area = 0;
             RentPrice = 0;
-            SelectedPurposeId = null;
+            SelectedPurposeId = 1;
             Description = "";
             UploadedFile = null;
 

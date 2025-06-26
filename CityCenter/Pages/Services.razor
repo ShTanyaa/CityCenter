@@ -131,6 +131,15 @@
         margin-right: auto;
     }
 
+        .no-photo-placeholder {
+            height: 100%;
+            background: linear-gradient(135deg, #333, #444);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-size: 1rem;
+        }
     /* Для светлой темы */
     .light-theme .services-screen {
         background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
@@ -170,18 +179,27 @@
             @foreach (var service in Service)
             {
                 <div class="service-card">
-                    <div class="service-card-img-container">
-                        @if (!string.IsNullOrWhiteSpace(service.Фото))
-                        {
-                            <img src="@service.Фото" alt="Фото сервиса" />
-                        }
-                        else
-                        {
-                            <div class="no-photo-placeholder">
-                                Фото отсутствует
-                            </div>
-                        }
-                    </div>
+                        <div class="service-card-img-container">
+                            @if (!string.IsNullOrWhiteSpace(service.Ссылка))
+                            {
+                                var siteUrl = GetFullUrl(service.Ссылка);
+                                var faviconUrl = $"https://www.google.com/s2/favicons?sz=128&domain_url={siteUrl}";
+                                <img src="@faviconUrl"
+                                     alt="Логотип сайта"
+                                     onerror="this.onerror=null; this.src='/images/placeholder.png';" />
+                            }
+                            else if (!string.IsNullOrWhiteSpace(service.Фото))
+                            {
+                                <img src="@service.Фото" alt="Фото сервиса" />
+                            }
+                            else
+                            {
+                                <div class="no-photo-placeholder">
+                                    Фото отсутствует
+                                </div>
+                            }
+                        </div>
+
 
                     <div class="service-card-content">
                         <h3>@service.Название</h3>
@@ -215,7 +233,7 @@
     protected override async Task OnInitializedAsync()
     {
         Service = await Db.Помещенияs
-            .Where(p => p.IdНазначения == 9) // ID 9 - сервисы и услуги
+            .Where(p => p.IdНазначения == 1) // ID 9 - сервисы и услуги
             .Select(p => new ServiceInfo
                 {
                     Название = p.Название,

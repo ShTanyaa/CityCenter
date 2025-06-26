@@ -7,220 +7,431 @@
 
 @inject ThemeService ThemeService
 <!DOCTYPE html>
-<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
+<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "dark-theme")">
 <head>
-<style>
-    /* Основные стили */
-    body {
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #0a0a0a, #111);
-        color: #fff;
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        transition: all 0.3s ease;
-    }
-
-    .tenant-profile {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 60px 40px;
-        color: white;
-    }
-
-    .tenant-name {
-        font-size: 3rem;
-        font-weight: bold;
-        margin-bottom: 40px;
-        text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.5);
-    }
-
-    .section-title {
-        font-size: 2rem;
-        margin: 40px 0 20px 0;
-    }
-
-    .grid {
-        width: 100%;
-        max-width: 1200px;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 25px;
-    }
-
-    .card {
-        background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(40, 40, 40, 0.95));
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        font-size: 1.3rem;
-        color: #fff;
-    }
-
-        .card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px #00aaff;
+    <style>
+        /* Основные стили (светлая тема по умолчанию) */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #e4e8eb);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            transition: all 0.3s ease;
         }
 
-    .btn {
-        margin-top: 15px;
-        padding: 10px 20px;
-        background-color: #00aaff;
-        border: none;
-        border-radius: 10px;
-        color: white;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background 0.3s ease;
-    }
-
-        .btn:hover {
-            background-color: #0088cc;
+        .tenant-profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 40px;
+            color: #333;
         }
 
-    /* Светлая тема */
-    body.light-theme {
-        background: linear-gradient(135deg, #f5f7fa, #e4e8eb);
-        color: #333;
-    }
-
-    .light-theme .tenant-profile {
-        color: #333;
-    }
-
-    .light-theme .tenant-name {
-        text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
-        color: #222;
-    }
-
-    .light-theme .card {
-        background: linear-gradient(135deg, rgba(245, 245, 245, 0.95), rgba(255, 255, 255, 0.95));
-        color: #333;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e0e0e0;
-    }
-
-        .light-theme .card:hover {
-            box-shadow: 0 0 30px rgba(0, 120, 215, 0.3);
+        .tenant-name {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 40px;
+            text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
+            color: #222;
         }
 
-    .light-theme .btn {
-        background-color: #0078d7;
-        color: white;
-    }
-
-        .light-theme .btn:hover {
-            background-color: #0066cc;
+        .section-title {
+            font-size: 2rem;
+            margin: 40px 0 20px 0;
+            color: #222;
         }
 
-    .light-theme .section-title {
-        color: #222;
-    }
-</style>
+        .grid {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, rgba(245, 245, 245, 0.95), rgba(255, 255, 255, 0.95));
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            font-size: 1.3rem;
+            color: #333;
+            border: 1px solid #e0e0e0;
+        }
+
+            .card:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 30px rgba(0, 120, 215, 0.3);
+            }
+
+        .btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #0078d7;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+            .btn:hover {
+                background-color: #0066cc;
+            }
+
+        /* Темная тема */
+        body.dark-theme {
+            background: linear-gradient(135deg, #0a0a0a, #111);
+            color: #fff;
+        }
+
+        .dark-theme .tenant-profile {
+            color: #fff;
+        }
+
+        .dark-theme .tenant-name {
+            text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.5);
+            color: #fff;
+        }
+
+        .dark-theme .card {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(40, 40, 40, 0.95));
+            color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            border: none;
+        }
+
+            .dark-theme .card:hover {
+                box-shadow: 0 0 30px #00aaff;
+            }
+
+        .dark-theme .btn {
+            background-color: #00aaff;
+            color: white;
+        }
+
+            .dark-theme .btn:hover {
+                background-color: #0088cc;
+            }
+
+        .dark-theme .section-title {
+            color: #fff;
+        }
+
+        /* Стили для вкладок (светлая тема по умолчанию) */
+        .tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 1200px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .tab-item {
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            background-color: #e0e0e0;
+            color: #555;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            white-space: nowrap;
+        }
+
+            .tab-item.active, .tab-item:hover {
+                background-color: #0078d7;
+                color: #fff;
+            }
+
+        /* Темная тема для вкладок */
+        .dark-theme .tab-item {
+            background-color: #2c2c2c;
+            color: #ccc;
+        }
+
+            .dark-theme .tab-item.active,
+            .dark-theme .tab-item:hover {
+                background-color: #00aaff;
+                color: #fff;
+            }
+
+        /* Стили для заявок */
+        .application-status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        .status-approved {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .status-rejected {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .application-image {
+            width: 100%;
+            max-height: 150px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-top: 10px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+        }
+
+        .dark-theme .application-image {
+            border-color: #444;
+        }
+
+        /* Стили для изображений в карточках */
+        .card-image-placeholder {
+            width: 100%;
+            height: 160px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+        }
+
+        .dark-theme .card-image-placeholder {
+            background: #333;
+            color: #aaa;
+        }
+
+        /* Модальное окно */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-image {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff4c4c;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
 </head>
-<body class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
-<div class="tenant-profile">
-    <div class="tenant-name">@FullName</div>
+<body class="@(ThemeService.IsLightTheme ? "light-theme" : "dark-theme")">
+    <div class="tenant-profile">
+        <div class="tenant-name">@FullName</div>
 
-    <div class="section-title">Арендованные помещения</div>
-    <div class="grid">
-        @foreach (var room in RentedRooms)
+        <div class="tabs">
+            <div class="tab-item @(activeTab == "rented" ? "active" : "")" @onclick='() => SetTab("rented")'>Арендованные помещения</div>
+            <div class="tab-item @(activeTab == "available" ? "active" : "")" @onclick='() => SetTab("available")'>Доступные помещения</div>
+            <div class="tab-item @(activeTab == "applications" ? "active" : "")" @onclick='() => SetTab("applications")'>Мои заявки (@Applications.Count)</div>
+        </div>
+
+        @if (activeTab == "rented")
         {
-         
-            <div class="card">
-                @if (!string.IsNullOrWhiteSpace(room.Фото))
+            <div class="grid">
+                @foreach (var room in RentedRooms)
                 {
-                    <img src="@room.Фото" alt="Фото помещения"
-                         style="width: 100%; max-height: 160px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;" />
-                }
-                else
-                {
-                    <div style="width: 100%; height: 160px; background: #333; border-radius: 10px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; color: #aaa;">
-                        Фото отсутствует
+                    <div class="card">
+                        @if (!string.IsNullOrWhiteSpace(room.Фото))
+                        {
+                            <img src="@room.Фото" alt="Фото помещения"
+                                 style="width: 100%; max-height: 160px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;" />
+                        }
+                        else
+                        {
+                            <div class="card-image-placeholder">
+                                Фото отсутствует
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(room.Договор))
+                        {
+                            <a class="btn" href="@room.Договор" target="_blank">📄 Открыть договор</a>
+                        }
+
+                        <p><strong>Название:</strong> @room.Название</p>
+                        <p><strong>Этаж:</strong> @room.Этаж</p>
+                        <p><strong>Площадь:</strong> @room.Площадь м²</p>
+                        <p><strong>Дата окончания:</strong> @room.ДатаОкончания?.ToShortDateString()</p>
+                        @if (EditingLinkRoomId == room.ID_Помещения)
+                        {
+                            <input class="form-control" placeholder="Ссылка на магазин" @bind="NewShopUrl" />
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button class="btn" @onclick="() => SaveShopLink(room.ID_Помещения)">💾 Сохранить ссылку</button>
+                                <button class="btn" style="background-color: #999;" @onclick="CancelEditLink">✖ Отмена</button>
+                            </div>
+                        }
+                        else
+                        {
+                            @if (!string.IsNullOrWhiteSpace(room.СсылкаНаМагазин))
+                            {
+                                <button class="btn" @onclick="() => StartEditLink(room.ID_Помещения)">📝 Изменить ссылку на магазин</button>
+                                <a href="@GetFullUrl(room.СсылкаНаМагазин)" class="btn" target="_blank">🌐 Перейти в магазин</a>
+                            }
+                            else
+                            {
+                                <button class="btn" @onclick="() => StartEditLink(room.ID_Помещения)">🛍 Добавить ссылку на магазин</button>
+                            }
+                        }
+
+                        @if (EditingRoomId == room.ID_Помещения)
+                        {
+                            <InputDate @bind-Value="NewEndDate" class="form-control" />
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <button class="btn" @onclick="() => SaveNewEndDate(room.ID_Помещения)">💾 Сохранить</button>
+                                <button class="btn" style="background-color: #999;" @onclick="CancelEdit">✖ Отмена</button>
+                            </div>
+                        }
+                        else
+                        {
+                            <button class="btn" @onclick="() => StartEdit(room.ID_Помещения, room.ДатаОкончания)">Изменить срок окончания</button>
+                        }
                     </div>
                 }
-                @if (!string.IsNullOrWhiteSpace(room.Договор))
-                {
-                    <a class="btn" href="@room.Договор" target="_blank">📄 Открыть договор</a>
-                }
-
-                <p><strong>Название:</strong> @room.Название</p>и
-                <p><strong>Этаж:</strong> @room.Этаж</p>
-                <p><strong>Площадь:</strong> @room.Площадь м²</p>
-                <p><strong>Дата окончания:</strong> @room.ДатаОкончания?.ToShortDateString()</p>
-                @if (EditingLinkRoomId == room.ID_Помещения)
-                {
-                    <input class="form-control" placeholder="Ссылка на магазин" @bind="NewShopUrl" />
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button class="btn" @onclick="() => SaveShopLink(room.ID_Помещения)">💾 Сохранить ссылку</button>
-                        <button class="btn" style="background-color: #999;" @onclick="CancelEditLink">✖ Отмена</button>
-                    </div>
-                }
-                else
-                {
-                    @if (!string.IsNullOrWhiteSpace(room.СсылкаНаМагазин))
-                    {
-                        <button class="btn" @onclick="() => StartEditLink(room.ID_Помещения)">📝 Изменить ссылку на магазин</button>
-                        <a href="@GetFullUrl(room.СсылкаНаМагазин)" class="btn" target="_blank">🌐 Перейти в магазин</a>
-                    }
-                    else
-                    {
-                        <button class="btn" @onclick="() => StartEditLink(room.ID_Помещения)">🛍 Добавить ссылку на магазин</button>
-                    }
-
-
-                }
-
-                @if (EditingRoomId == room.ID_Помещения)
-                {
-                    <InputDate @bind-Value="NewEndDate" class="form-control" />
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button class="btn" @onclick="() => SaveNewEndDate(room.ID_Помещения)">💾 Сохранить</button>
-                        <button class="btn" style="background-color: #999;" @onclick="CancelEdit">✖ Отмена</button>
-                    </div>
-                }
-                else
-                {
-                    <button class="btn" @onclick="() => StartEdit(room.ID_Помещения, room.ДатаОкончания)">Изменить срок окончания</button>
-                }
-
-
             </div>
         }
-    </div>
-   
-
-    <div class="section-title">Доступные помещения для аренды</div>
-    <div class="grid">
-        @foreach (var room in AvailableRooms)
+        else if (activeTab == "available")
         {
-            <div class="card">
-                @if (!string.IsNullOrWhiteSpace(room.Фото))
+            <div class="grid">
+                @foreach (var room in AvailableRooms)
                 {
-                    <img src="@room.Фото" alt="Фото помещения"
-                         style="width: 100%; max-height: 160px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;" />
-                }
-                else
-                {
-                    <div style="width: 100%; height: 160px; background: #333; border-radius: 10px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; color: #aaa;">
-                        Фото отсутствует
+                    <div class="card">
+                        @if (!string.IsNullOrWhiteSpace(room.Фото))
+                        {
+                            <img src="@room.Фото" alt="Фото помещения"
+                                 style="width: 100%; max-height: 160px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;" />
+                        }
+                        else
+                        {
+                            <div class="card-image-placeholder">
+                                Фото отсутствует
+                            </div>
+                        }
+                        <p><strong>Название:</strong> @room.Название</p>
+                        <p><strong>Этаж:</strong> @room.Этаж</p>
+                        <p><strong>Площадь:</strong> @room.Площадь м²</p>
+                        <p><strong>Стоимость аренды:</strong> @room.СтоимостьАренды.ToString("N0") руб/мес</p>
+                        <button class="btn" @onclick='() => GoToRoomDetails(room.ID_Помещения)'>Арендовать</button>
                     </div>
                 }
-                <p><strong>Название:</strong> @room.Название</p>
-                <p><strong>Этаж:</strong> @room.Этаж</p>
-                <p><strong>Площадь:</strong> @room.Площадь м²</p>
-                <p><strong>Стоимость аренды:</strong> @room.СтоимостьАренды.ToString("C")</p>
-                <button class="btn" @onclick='() => GoToRoomDetails(room.ID_Помещения)'>Арендовать</button>
-
             </div>
+            <button class="btn" style="margin-bottom: 20px;" @onclick="GoToMapView">
+                🗺 Смотреть на карте
+            </button>
+        }
+        else if (activeTab == "applications")
+        {
+            @if (Applications.Count == 0)
+            {
+                <div class="card" style="text-align: center; max-width: 600px;">
+                    <p>У вас пока нет заявок на аренду</p>
+                    <button class="btn" @onclick='() => SetTab("available")'>Посмотреть доступные помещения</button>
+                </div>
+            }
+            else
+            {
+                <div class="grid">
+                    @foreach (var app in Applications)
+                    {
+                        <div class="card">
+                            <p><strong>Заявка #@app.ID_Заявки</strong></p>
+                            <p><strong>Помещение:</strong> @RoomNames.GetValueOrDefault(app.ID_Помещения, "Удалено")</p>
+                            <p><strong>Дата заявки:</strong> @app.ДатаЗаявки.ToShortDateString()</p>
+
+                            <div class="application-status @GetStatusClass(app.Статус)">
+                                @app.Статус
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(app.Комментарий))
+                            {
+                                <p style="margin-top: 10px;">@app.Комментарий</p>
+                            }
+
+                            @if (!string.IsNullOrEmpty(app.ФотоОплаты))
+                            {
+                                var extension = Path.GetExtension(app.ФотоОплаты)?.ToLowerInvariant();
+                                var isImage = extension == ".jpg" || extension == ".jpeg" || extension == ".png" || extension == ".gif" || extension == ".bmp" || extension == ".webp";
+
+                                if (isImage)
+                                {
+                                    <img src="@app.ФотоОплаты"
+                                         alt="Скрин оплаты"
+                                         class="application-image"
+                                         @onclick="() => ShowFullImage(app.ФотоОплаты)" />
+                                }
+                                else
+                                {
+                                    <p><strong>Прикреплённый файл:</strong></p>
+                                    <a href="@app.ФотоОплаты" target="_blank" class="btn btn-secondary">
+                                        Скачать файл
+                                    </a>
+                                }
+                            }
+
+                            <div class="button-group" style="margin-top: 15px;">
+                                <button class="btn btn-outline" @onclick="() => EditApplication(app.ID_Заявки)">Редактировать</button>
+                                <button class="btn btn-danger" @onclick="() => DeleteApplication(app.ID_Заявки)">Удалить</button>
+                            </div>
+
+                            @if (app.Статус == "Отклонено")
+                            {
+                                <button class="btn" style="margin-top: 15px;" @onclick='() => GoToRoomDetails(app.ID_Помещения)'>
+                                    Подать новую заявку
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+
+            }
         }
     </div>
-    <button class="btn" style="margin-bottom: 20px;" @onclick="GoToMapView">
-        🗺 Смотреть на карте
-    </button>
-</div>
+
+    <!-- Модальное окно для полноразмерного изображения -->
+    @if (showFullImage)
+    {
+        <div class="modal-overlay" @onclick="CloseFullImage">
+            <img src="@currentImageUrl" class="modal-image" />
+            <button class="modal-close-btn" @onclick="CloseFullImage">
+                ×
+            </button>
+        </div>
+    }
 </body>
 </html>
 
@@ -230,17 +441,61 @@
     private string FullName;
     private List<RoomModel> RentedRooms = new();
     private List<RoomModel> AvailableRooms = new();
+    private List<ЗаявкаНаАренду> Applications = new();
+    private Dictionary<int, string> RoomNames = new();
+    private string activeTab = "rented";
 
     private int? EditingRoomId = null;
     private DateTime? NewEndDate;
+    private int? EditingLinkRoomId = null;
+    private string? NewShopUrl = null;
 
+    private bool showFullImage = false;
+    private string currentImageUrl = string.Empty;
+
+    private void ShowFullImage(string imageUrl)
+    {
+        currentImageUrl = imageUrl;
+        showFullImage = true;
+    }
+
+    private void CloseFullImage()
+    {
+        showFullImage = false;
+        currentImageUrl = string.Empty;
+    }
+    private void EditApplication(int applicationId)
+    {
+        // Навигация к странице редактирования заявки (предположим, она существует)
+        NavigationManager.NavigateTo($"/edit-application/{applicationId}?userId={UserId}");
+    }
+
+    private async Task DeleteApplication(int applicationId)
+    {
+        var application = await Db.ЗаявкиНаАренду.FindAsync(applicationId);
+        if (application != null)
+        {
+            Db.ЗаявкиНаАренду.Remove(application);
+            await Db.SaveChangesAsync();
+            await LoadApplications(); // Обновляем список
+        }
+    }
+
+    private string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "В обработке" => "status-pending",
+            "Принято" => "status-approved",
+            "Отклонено" => "status-rejected",
+            _ => ""
+        };
+    }
 
     private void GoToMapView()
     {
         NavigationManager.NavigateTo($"/map-rent/?userId={UserId}");
     }
-
-
 
     private void GoToRoomDetails(int roomId)
     {
@@ -258,6 +513,7 @@
         EditingRoomId = null;
         NewEndDate = null;
     }
+
     private async Task SaveNewEndDate(int roomId)
     {
         if (NewEndDate == null)
@@ -274,37 +530,19 @@
         if (аренда != null)
         {
             аренда.ДатаОкончания = NewEndDate.Value;
-            аренда.ДатаПоследнегоИзменения = DateTime.Now; // <-- обновляем дату изменения
-
+            аренда.ДатаПоследнегоИзменения = DateTime.Now;
             await Db.SaveChangesAsync();
-            await OnInitializedAsync(); // полностью обновить данные
 
-
-            // Обновляем отображение
-            RentedRooms = await Db.Арендаs
-      .Where(a => a.IdАрендатора == арендатор.IdАрендатора && a.IdПомещенияNavigation.ДоступноДляАренды == false)
-      .Include(a => a.IdПомещенияNavigation)
-      .Select(a => new RoomModel
-          {
-              ID_Помещения = a.IdПомещения, // ← ОБЯЗАТЕЛЬНО
-              Название = a.IdПомещенияNavigation.Название,
-              Этаж = a.IdПомещенияNavigation.Этаж,
-              Площадь = (int)a.IdПомещенияNavigation.Площадь,
-              ДатаОкончания = a.ДатаОкончания,
-              Фото = a.IdПомещенияNavigation.Фото
-          })
-      .ToListAsync();
-            Console.WriteLine($"→ Сохраняем дату: {NewEndDate}");
+            // Обновляем список помещений
+            await LoadRentedRooms();
         }
 
         CancelEdit();
     }
 
-
     private string GetFullUrl(string? url)
     {
-        url = url?.Trim(); // Убираем пробелы в начале и конце
-
+        url = url?.Trim();
         if (string.IsNullOrWhiteSpace(url))
             return "#";
 
@@ -312,51 +550,6 @@
             ? url
             : $"https://{url}";
     }
-
-
-
-    protected override async Task OnInitializedAsync()
-    {
-        var user = await Db.Пользователиs.FindAsync(UserId);
-        FullName = user?.Фио ?? "Арендатор";
-
-        var арендатор = await Db.Арендаторыs.FirstOrDefaultAsync(a => a.IdПользователя == UserId);
-
-        if (арендатор != null)
-        {
-            RentedRooms = await Db.Арендаs
-      .Where(a => a.IdАрендатора == арендатор.IdАрендатора && a.IdПомещенияNavigation.ДоступноДляАренды == false)
-      .Include(a => a.IdПомещенияNavigation)
-      .Select(a => new RoomModel
-          {
-              ID_Помещения = a.IdПомещения, // ✅ ОБЯЗАТЕЛЬНО!
-              Название = a.IdПомещенияNavigation.Название,
-              Этаж = a.IdПомещенияNavigation.Этаж,
-              Площадь = (int)a.IdПомещенияNavigation.Площадь,
-              ДатаОкончания = a.ДатаОкончания,
-              Фото = a.IdПомещенияNavigation.Фото,
-              СсылкаНаМагазин = a.IdПомещенияNavigation.СсылкаНаМагазин
-          })
-      .ToListAsync();
-
-        }
-
-        AvailableRooms = await Db.Помещенияs
-     .Where(p => p.ДоступноДляАренды)
-     .Select(p => new RoomModel
-         {
-             ID_Помещения = p.IdПомещения,
-             Название = p.Название,
-             Этаж = p.Этаж,
-             Площадь = (int)p.Площадь,
-             СтоимостьАренды = p.СтоимостьАренды,
-               Фото = p.Фото
-         })
-     .ToListAsync();
-
-    }
-    private int? EditingLinkRoomId = null;
-    private string? NewShopUrl = null;
 
     private void StartEditLink(int roomId)
     {
@@ -390,6 +583,76 @@
 
         CancelEditLink();
     }
+
+    private void SetTab(string tab)
+    {
+        activeTab = tab;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await Db.Пользователиs.FindAsync(UserId);
+        FullName = user?.Фио ?? "Арендатор";
+
+        await LoadRentedRooms();
+        await LoadAvailableRooms();
+        await LoadApplications();
+    }
+
+    private async Task LoadRentedRooms()
+    {
+        var арендатор = await Db.Арендаторыs.FirstOrDefaultAsync(a => a.IdПользователя == UserId);
+
+        if (арендатор != null)
+        {
+            RentedRooms = await Db.Арендаs
+                .Where(a => a.IdАрендатора == арендатор.IdАрендатора && a.IdПомещенияNavigation.ДоступноДляАренды == false)
+                .Include(a => a.IdПомещенияNavigation)
+                .Select(a => new RoomModel
+                    {
+                        ID_Помещения = a.IdПомещения,
+                        Название = a.IdПомещенияNavigation.Название,
+                        Этаж = a.IdПомещенияNavigation.Этаж,
+                        Площадь = (int)a.IdПомещенияNavigation.Площадь,
+                        ДатаОкончания = a.ДатаОкончания,
+                        Фото = a.IdПомещенияNavigation.Фото,
+                        СсылкаНаМагазин = a.IdПомещенияNavigation.СсылкаНаМагазин
+                    })
+                .ToListAsync();
+        }
+    }
+
+    private async Task LoadAvailableRooms()
+    {
+        AvailableRooms = await Db.Помещенияs
+            .Where(p => p.ДоступноДляАренды)
+            .Select(p => new RoomModel
+                {
+                    ID_Помещения = p.IdПомещения,
+                    Название = p.Название,
+                    Этаж = p.Этаж,
+                    Площадь = (int)p.Площадь,
+                    СтоимостьАренды = p.СтоимостьАренды,
+                    Фото = p.Фото
+                })
+            .ToListAsync();
+    }
+
+    private async Task LoadApplications()
+    {
+        Applications = await Db.ЗаявкиНаАренду
+            .Where(z => z.ID_Пользователя == UserId)
+            .OrderByDescending(z => z.ДатаЗаявки)
+            .ToListAsync();
+
+        var roomIds = Applications.Select(z => z.ID_Помещения).Distinct();
+        var rooms = await Db.Помещенияs
+            .Where(r => roomIds.Contains(r.IdПомещения))
+            .ToListAsync();
+
+        RoomNames = rooms.ToDictionary(r => r.IdПомещения, r => r.Название);
+    }
+
     private class RoomModel
     {
         public int ID_Помещения { get; set; }
@@ -398,7 +661,7 @@
         public int Площадь { get; set; }
         public DateTime? ДатаОкончания { get; set; }
         public decimal СтоимостьАренды { get; set; }
-        public string Фото { get; set; } // путь к изображению
+        public string Фото { get; set; }
         public string? Договор { get; set; }
         public string? СсылкаНаМагазин { get; set; }
     }

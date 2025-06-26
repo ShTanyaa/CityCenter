@@ -8,138 +8,148 @@
 <!DOCTYPE html>
 <html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
 <head>
-<style>
-    /* Общие стили */
-    .back-arrow {
-        position: absolute;
-        top: 30px;
-        left: 30px;
-        font-size: 2rem;
-        cursor: pointer;
-        color: #00aaff;
-        transition: transform 0.2s ease;
-        z-index: 10;
-    }
-
-        .back-arrow:hover {
-            transform: scale(1.2);
-            color: #0088cc;
+    <style>
+        /* Общие стили */
+        .back-arrow {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #00aaff;
+            transition: transform 0.2s ease;
+            z-index: 10;
         }
 
-    body {
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #0a0a0a, #111);
-        color: #fff;
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-    }
+            .back-arrow:hover {
+                transform: scale(1.2);
+                color: #0088cc;
+            }
 
-    .edit-screen {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 60px 40px;
-        font-family: 'Poppins', sans-serif;
-    }
-
-    h2 {
-        font-size: 3rem;
-        margin-bottom: 30px;
-        color: #fff;
-        text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.5);
-    }
-
-    .form-control {
-        padding: 22px;
-        font-size: 1.3rem;
-        border-radius: 12px;
-        border: none;
-        margin-bottom: 20px;
-        width: 100%;
-        max-width: 600px;
-        background-color: #1e1e1e;
-        color: white;
-        transition: box-shadow 0.3s ease;
-    }
-
-        .form-control:focus {
-            outline: none;
-            box-shadow: 0 0 10px #00aaff;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a, #111);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
         }
 
-    .btn {
-        padding: 18px 35px;
-        font-size: 1.4rem;
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        background: #00aaff;
-        color: white;
-        margin-top: 20px;
-        transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-        .btn:hover {
-            background: #0088cc;
-            transform: scale(1.03);
-            box-shadow: 0 0 10px #00aaff;
+        .edit-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 60px 40px;
+            font-family: 'Poppins', sans-serif;
         }
 
-    .message {
-        margin-top: 20px;
-        font-size: 1.2rem;
-        color: #4caf50;
-    }
-
-    /* Светлая тема */
-    body.light-theme {
-        background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
-        color: #333;
-    }
-
-    .light-theme .edit-screen {
-        background: transparent;
-    }
-
-    .light-theme h2 {
-        color: #222;
-        text-shadow: none;
-    }
-
-    .light-theme .back-arrow {
-        color: #0078d7;
-    }
-
-        .light-theme .back-arrow:hover {
-            color: #005fa3;
+        h2 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            color: #fff;
+            text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.5);
         }
 
-    .light-theme .form-control {
-        background-color: #fff;
-        color: #333;
-        border: 1px solid #ddd;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-        .light-theme .form-control:focus {
-            box-shadow: 0 0 10px rgba(0, 120, 215, 0.5);
+        .form-control {
+            padding: 22px;
+            font-size: 1.3rem;
+            border-radius: 12px;
+            border: none;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 600px;
+            background-color: #1e1e1e;
+            color: white;
+            transition: box-shadow 0.3s ease;
         }
 
-    .light-theme .btn {
-        background: #0078d7;
-        color: white;
-    }
+            .form-control:focus {
+                outline: none;
+                box-shadow: 0 0 10px #00aaff;
+            }
 
-        .light-theme .btn:hover {
-            background: #0066cc;
-            box-shadow: 0 0 10px rgba(0, 120, 215, 0.5);
+        .btn {
+            padding: 18px 35px;
+            font-size: 1.4rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            background: #00aaff;
+            color: white;
+            margin-top: 20px;
+            transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-    .light-theme .message {
-        color: #2e7d32;
-    }
-</style>
+            .btn:hover {
+                background: #0088cc;
+                transform: scale(1.03);
+                box-shadow: 0 0 10px #00aaff;
+            }
+
+        .message {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #4caf50;
+        }
+
+        .error-message {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #ff5252;
+        }
+
+        /* Светлая тема */
+        body.light-theme {
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+            color: #333;
+        }
+
+        .light-theme .edit-screen {
+            background: transparent;
+        }
+
+        .light-theme h2 {
+            color: #222;
+            text-shadow: none;
+        }
+
+        .light-theme .back-arrow {
+            color: #0078d7;
+        }
+
+            .light-theme .back-arrow:hover {
+                color: #005fa3;
+            }
+
+        .light-theme .form-control {
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+            .light-theme .form-control:focus {
+                box-shadow: 0 0 10px rgba(0, 120, 215, 0.5);
+            }
+
+        .light-theme .btn {
+            background: #0078d7;
+            color: white;
+        }
+
+            .light-theme .btn:hover {
+                background: #0066cc;
+                box-shadow: 0 0 10px rgba(0, 120, 215, 0.5);
+            }
+
+        .light-theme .message {
+            color: #2e7d32;
+        }
+
+        .light-theme .error-message {
+            color: #d32f2f;
+        }
+    </style>
 </head>
 <body class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
     <div class="edit-screen">
@@ -157,6 +167,18 @@
             <input class="form-control" @bind="room.Название" placeholder="Название" />
             <input type="number" class="form-control" @bind="room.Этаж" min="1" max="4" placeholder="Этаж (1-4)" />
             <input type="number" class="form-control" @bind="room.Площадь" min="5" max="300" placeholder="Площадь (5-300 м²)" />
+
+            <!-- Добавлено поле для стоимости аренды -->
+            <div style="width: 100%; max-width: 600px;">
+                <input type="number" class="form-control"
+                       @bind="room.СтоимостьАренды"
+                       placeholder="Стоимость аренды (руб/мес)"
+                       min="10000" />
+                <small style="color: #aaa; display: block; margin-top: -15px; margin-bottom: 20px;">
+                    Минимальная стоимость: 10,000 руб/мес
+                </small>
+            </div>
+
             <textarea class="form-control" @bind="room.Описание" placeholder="Описание помещения"></textarea>
 
             <select class="form-control" @bind="room.ДоступноДляАренды">
@@ -171,21 +193,26 @@
             {
                 <div class="message">@Message</div>
             }
+            @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+            {
+                <div class="error-message">@ErrorMessage</div>
+            }
         }
         else
         {
             <p>Загрузка данных...</p>
         }
-
     </div>
 </body>
 </html>
+
 @code {
     [Parameter] public int id { get; set; }
     [Inject] public IWebHostEnvironment Env { get; set; }
 
     private Помещения? room;
     private string? Message;
+    private string? ErrorMessage;
     private IBrowserFile? UploadedFile;
 
     protected override async Task OnInitializedAsync()
@@ -200,38 +227,51 @@
 
     private async Task SaveChanges()
     {
+        // Сбрасываем сообщения
+        Message = null;
+        ErrorMessage = null;
+
         if (room != null)
         {
-            // Проверка площади
-            if (room.Название=="")
+            // Проверка названия
+            if (string.IsNullOrWhiteSpace(room.Название))
             {
-                Message = "❌ Укажите название помещения";
+                ErrorMessage = "❌ Укажите название помещения";
                 return;
             }
 
-          
-
             // Проверка площади
+            if (room.Площадь < 5 || room.Площадь > 300)
+            {
+                ErrorMessage = "❌ Площадь должна быть от 5 до 300 м²";
+                return;
+            }
+
+            // Проверка стоимости аренды
             if (room.СтоимостьАренды < 10000)
             {
-                Message = "❌ Стоимость аренды должна быть не менее 10,000 ₽";
+                ErrorMessage = "❌ Стоимость аренды должна быть не менее 10,000 руб/мес";
                 return;
             }
-
-           
 
             if (UploadedFile != null)
             {
                 room.Фото = await UploadImage(UploadedFile);
             }
 
-            Db.Помещенияs.Update(room);
-            await Db.SaveChangesAsync();
-            Message = "✅ Изменения сохранены";
+            try
+            {
+                Db.Помещенияs.Update(room);
+                await Db.SaveChangesAsync();
+                Message = "✅ Изменения сохранены";
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"❌ Ошибка при сохранении: {ex.Message}";
+            }
         }
     }
 
-    // Можно добавить проверку типа файла
     private async Task HandleFileUpload(InputFileChangeEventArgs e)
     {
         const long maxFileSize = 2 * 1024 * 1024;
@@ -241,18 +281,18 @@
 
         if (!allowedExtensions.Contains(fileExt))
         {
-            Message = "❌ Можно загружать только изображения (JPG, PNG, WebP)";
+            ErrorMessage = "❌ Можно загружать только изображения (JPG, PNG, WebP)";
             return;
         }
 
         if (e.File.Size > maxFileSize)
         {
-            Message = $"❌ Максимальный размер файла: {maxFileSize / 1024 / 1024} МБ";
+            ErrorMessage = $"❌ Максимальный размер файла: {maxFileSize / 1024 / 1024} МБ";
             return;
         }
 
         UploadedFile = e.File;
-        Message = null; // Сбрасываем ошибку если файл подходит
+        ErrorMessage = null; // Сбрасываем ошибку если файл подходит
     }
 
     private async Task<string> UploadImage(IBrowserFile file)
@@ -265,9 +305,8 @@
 
         var filePath = Path.Combine(folderPath, fileName);
 
-        // Увеличиваем лимит до 2 МБ (или другого нужного вам значения)
         await using var stream = new FileStream(filePath, FileMode.Create);
-        await file.OpenReadStream(maxAllowedSize: 2 * 1024 * 1024).CopyToAsync(stream); // 2 МБ
+        await file.OpenReadStream(maxAllowedSize: 2 * 1024 * 1024).CopyToAsync(stream);
 
         return "/images/" + fileName;
     }

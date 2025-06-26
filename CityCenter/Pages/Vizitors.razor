@@ -10,7 +10,7 @@
 @inject ThemeService ThemeService
 
 <!DOCTYPE html>
-<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
+<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "dark-theme")">
 <head>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -19,6 +19,20 @@
     <title>Торговый Центр</title>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <style>
+        /* Добавьте в ваш CSS */
+        #mall-map-section {
+            margin-bottom: 40px; /* Отступ после всей секции с картой */
+        }
+        .floor-selector {
+            font-size: 1.3rem;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            background-color: #fff;
+            color: #333;
+            box-shadow: 0 0 10px rgba(0, 120, 215, 0.5);
+            border: 1px solid #ddd;
+        }
         /* Основные стили светлой темы */
         .light-theme {
             background: linear-gradient(135deg, #f0f0f0, #e0e0e0) !important;
@@ -150,6 +164,12 @@
                     background-color: #005a9e !important;
                 }
 
+            .light-theme .floor-selector {
+                background-color: #fff !important;
+                color: #333 !important;
+                box-shadow: 0 0 10px rgba(0, 120, 215, 0.5) !important;
+                border: 1px solid #ddd !important;
+            }
             /* Специфические элементы для арендованных/неарендованных помещений */
             .light-theme g.rented:hover rect {
                 fill: rgba(0, 120, 215, 0.15) !important;
@@ -291,99 +311,7 @@
             box-sizing: border-box;
         }
 
-        .slider-container {
-            position: relative;
-            width: 100%;
-            height: 700px;
-            overflow: visible;
-            margin-top: 100px; /* опустили ниже */
-            max-width: 800px;
-        }
 
-
-
-        .slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-            .slide.active {
-                opacity: 1;
-                z-index: 1;
-            }
-
-
-            .slide svg {
-                width: 100%;
-                height: 100%;
-                max-width: 100%;
-                max-height: 100%;
-                display: block;
-                margin: auto;
-            }
-
-
-
-        .controls,
-        .floor-controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            width: 100%;
-            margin: 30px 0;
-            padding: 0 30px;
-        }
-
-            .controls button,
-            .floor-controls button {
-                padding: 10px 26px;
-                font-size: 1.2rem;
-                border: none;
-                border-radius: 10px;
-                background-color: #00aaff;
-                color: white;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-
-                .controls button:hover,
-                .floor-controls button:hover {
-                    background-color: #0077aa;
-                }
-
-
-
-        .floor-switcher {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-            .floor-switcher button {
-                padding: 10px 20px;
-                font-size: 1rem;
-                background-color: #007bff;
-                color: white;
-                border: none;
-                border-radius: 8px;
-                cursor: pointer;
-                transition: background-color 0.3s;
-            }
-
-                .floor-switcher button:hover {
-                    background-color: #0056b3;
-                }
 
         .floor-map {
             display: none;
@@ -394,6 +322,8 @@
             }
 
         body {
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+            color: #333;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -404,12 +334,31 @@
             margin: 0;
             padding: 0;
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0a0a0a, #1e1e1e);
             background-size: cover;
+        }
+
+        .dark-theme body {
+            background: linear-gradient(135deg, #0a0a0a, #1e1e1e);
             color: #fff;
         }
 
+        .dark-theme .block {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 1), rgba(40, 40, 40, 0.6));
+            color: white;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.8);
+        }
 
+            .dark-theme .block:hover {
+                background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 100, 150, 0.4));
+                box-shadow: 0 0 20px #00aaff;
+            }
+
+        .dark-theme .floor-selector {
+            background-color: #1e1e1e;
+            color: white;
+            box-shadow: 0 0 10px #00aaff;
+            border: none;
+        }
         .hidden {
             display: none !important;
         }
@@ -437,13 +386,14 @@
 
 
         .block {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(240, 240, 240, 0.8));
+            color: #333;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
             padding: 30px;
             border-radius: 20px;
             text-align: center;
             font-size: 1.6rem;
             font-weight: 600;
-            color: white;
-            background: linear-gradient(135deg, rgba(0, 0, 0, 1), rgba(40, 40, 40, 0.6));
             width: 22%;
             min-width: 200px;
             box-sizing: border-box;
@@ -451,7 +401,6 @@
             justify-content: center;
             align-items: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-            box-shadow: 0 0 12px rgba(0, 0, 0, 0.8);
         }
 
             .block:hover {
@@ -462,56 +411,41 @@
 
 
 
+        /* Светлая тема (по умолчанию) */
         .sidebar {
             width: 80px;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(255, 255, 255, 0.9); /* Белый с прозрачностью */
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); /* Более светлая тень */
             position: fixed;
             left: 0;
             top: 0;
-            transition: width 0.3s ease;
+            transition: width 0.3s ease, background 0.3s ease;
             overflow: hidden;
             padding-top: 80px;
         }
 
-            .sidebar:hover {
-                width: 250px;
+            .sidebar ul li {
+                color: #333; /* Темный текст для светлой темы */
             }
 
-            .sidebar ul {
-                list-style: none;
-                padding: 0;
-                margin: 0;
-            }
-
-                .sidebar ul li {
-                    padding: 15px;
-                    color: white;
-                    display: flex;
-                    align-items: center;
-                    cursor: pointer;
-                    transition: background 0.3s;
+                .sidebar ul li:hover {
+                    background: rgba(0, 0, 0, 0.1); /* Светлый hover */
                 }
 
-                    .sidebar ul li:hover {
-                        background: rgba(255, 255, 255, 0.2);
-                    }
+        /* Темная тема */
+        .dark-theme .sidebar {
+            background: rgba(0, 0, 0, 0.8); /* Темный фон */
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.8); /* Более темная тень */
+        }
 
-                    .sidebar ul li i {
-                        font-size: 20px;
-                        width: 40px;
-                        text-align: center;
-                    }
-
-                    .sidebar ul li span {
-                        opacity: 0;
-                        transition: opacity 0.3s;
-                        white-space: nowrap;
-                    }
-
-            .sidebar:hover ul li span {
-                opacity: 1;
+            .dark-theme .sidebar ul li {
+                color: white; /* Белый текст для темной темы */
             }
+
+                .dark-theme .sidebar ul li:hover {
+                    background: rgba(255, 255, 255, 0.2); /* Темный hover */
+                }
 
         .map-container {
             margin: 20px auto; /* Центрирование по горизонтали */
@@ -613,10 +547,6 @@
         svg g[id^="Store-"]:not(.svg-disabled) {
             cursor: pointer;
         }
-
-   
-
-
     
 
         .screen {
@@ -632,137 +562,6 @@
         }
 
 
-
-
-        .back-button.top-left {
-            position: absolute;
-            top: 30px;
-            left: 30px;
-            background: transparent;
-            border: none;
-            color: white;
-            text-decoration: underline;
-            font-size: 1rem;
-            cursor: pointer;
-            z-index: 1000;
-        }
-
-        .login-screen {
-            position: fixed;
-            inset: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            z-index: 999;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-
-        .login-box {
-            position: relative;
-            background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(40, 40, 40, 0.95));
-            padding: 100px 120px;
-            border-radius: 24px;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
-            min-width: 600px;
-            max-width: 700px;
-            width: 100%;
-            color: #fff;
-            font-size: 1.4rem;
-            transition: transform 0.3s ease;
-        }
-
-            .login-box h2 {
-                margin-bottom: 30px;
-                font-size: 2.8rem;
-                font-weight: 600;
-            }
-
-        .login-input {
-            display: block;
-            margin: 18px auto;
-            padding: 22px;
-            width: 100%;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.3rem;
-            font-family: 'Poppins', sans-serif;
-            background-color: #1e1e1e;
-            color: #fff;
-            transition: box-shadow 0.3s ease;
-        }
-
-            .login-input:focus {
-                outline: none;
-                box-shadow: 0 0 10px #00aaff;
-            }
-
-        .login-button {
-            background: #00aaff;
-            color: white;
-            border: none;
-            padding: 20px 40px;
-            margin-top: 25px;
-            border-radius: 14px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.4rem;
-            width: 100%;
-            transition: background 0.3s ease;
-        }
-
-            .login-button:hover {
-                background: #0088cc;
-            }
-
-        .back-button {
-            background: transparent;
-            border: none;
-            color: white;
-            margin-top: 15px;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-
-            .back-button.inside {
-                position: absolute;
-                top: 25px;
-                left: 25px;
-                background: transparent;
-                border: none;
-                color: #ccc;
-                text-decoration: underline;
-                font-size: 1.2rem;
-                cursor: pointer;
-                transition: color 0.3s ease;
-            }
-
-                .back-button.inside:hover {
-                    color: #fff;
-                }
-
-        .login-links {
-            margin-top: 25px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .login-link {
-            color: #aaa;
-            font-size: 1.2rem;
-            text-decoration: underline;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-
-            .login-link:hover {
-                color: #fff;
-            }
-
-
         .scroll-down {
             margin-top: 40px;
             cursor: pointer;
@@ -770,20 +569,6 @@
             font-size: 2.5rem;
             color: #00aaff;
         }
-
-        /*  @@keyframes bounce {
-                    0%, 20%, 50%, 80%, 100% {
-                        transform: translateY(0);
-                    }
-
-                    40% {
-                        transform: translateY(10px);
-                    }
-
-                    60% {
-                        transform: translateY(5px);
-                    }
-                } */
 
         .footer {
             background: #111;
@@ -866,14 +651,14 @@
         <div class="welcome-text">Добро пожаловать в Сити Центр</div>
 
         <div class="content">
-            <div class="block">
-                <span @onclick="NavigateToShops">Магазины</span>
+            <div class="block" @onclick="NavigateToShops">
+                <span>Магазины</span>
             </div>
-            <div class="block">
-                <span @onclick="NavigateToFood">Кафе и рестораны</span>
+            <div class="block" @onclick="NavigateToFood">
+                <span>Кафе и рестораны</span>
             </div>
-            <div class="block">
-                <span @onclick="NavigateToServices">Сервисы и услуги</span>
+            <div class="block" @onclick="NavigateToServices">
+                <span>Сервисы и услуги</span>
             </div>
         </div>
         <!-- Стрелка вниз -->
@@ -883,64 +668,26 @@
 
 
 
-        <h2 id="mall-map" style="text-align:center; margin-top: 80px;">Карта ТЦ</h2>
-
-
-        <div class="svg-container">
-            @((MarkupString)SvgContent)
+        <div id="mall-map-section">
+            <h2 id="mall-map" style="text-align: center; margin-top: 80px; margin-bottom: 20px;">Карта ТЦ</h2>
+            <select @onchange="OnFloorChanged" class="floor-selector" style="margin-bottom: 20px;">
+                <option value="1">1 этаж</option>
+                <option value="2">2 этаж</option>
+                <option value="3">3 этаж</option>
+                <option value="4">4 этаж</option>
+            </select>
+            <div class="svg-container">
+                @((MarkupString)SvgContent)
+            </div>
         </div>
 
+      
 
-        <div class="floor-controls">
-            <button @onclick="Prev">← Назад</button>
-            <span>@floors[currentIndex]</span>
-            <button @onclick="Next">Вперед →</button>
-        </div>
+      
 
     </div>
 
   
-
-
-    <!-- Экран входа -->
-    <div id="login-screen" class="login-screen hidden">
-        <div class="login-box">
-            <button class="back-button inside" onclick="showSection('home')">← Назад</button>
-
-            <h2>Вход в систему</h2>
-            <input type="text" placeholder="Логин" class="login-input" />
-            <input type="password" placeholder="Пароль" class="login-input" />
-            <button class="login-button">Войти</button>
-
-            <div class="login-links">
-                <a href="#" class="login-link">Забыли пароль?</a>
-                <a href="#" class="login-link" onclick="showSection('register-screen')">Ещё нет аккаунта? Зарегистрироваться</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Экран регистрации -->
-    <div id="register-screen" class="login-screen hidden">
-        <div class="login-box">
-            <button class="back-button inside" onclick="showSection('home')">← Назад</button>
-
-            <h2>Регистрация</h2>
-            <input type="text" id="regFullName" placeholder="ФИО" class="login-input" />
-            <input type="email" id="regEmail" placeholder="Email" class="login-input" />
-            <input type="text" id="regPhone" placeholder="Телефон" class="login-input" />
-            <input type="text" id="regLogin" placeholder="Логин" class="login-input" />
-            <input type="password" id="regPassword" placeholder="Пароль" class="login-input" />
-            <input type="password" id="regRepeatPassword" placeholder="Повторите пароль" class="login-input" />
-
-            <button class="login-button" onclick="registerUser()">Зарегистрироваться</button>
-
-
-            <div class="login-links">
-                <a href="#" class="login-link" onclick="showSection('login-screen')">Уже есть аккаунт? Войти</a>
-            </div>
-        </div>
-    </div>
-
 
 </body>
 <footer class="footer">
@@ -965,30 +712,11 @@
         </div>
     </div>
 </footer>
+
+</html>
 <script>
 
-    function toggleSearchPanel() {
-        const panel = document.getElementById('search-panel');
-        panel.classList.toggle('hidden');
-    }
 
-    function performSearch() {
-        const query = document.getElementById('search-input').value;
-        alert("Поиск: " + query);
-        document.getElementById('search-panel').classList.add('hidden');
-    }
-
-
-    function handleKeyPress(event) {
-        if (event.key === 'Enter') {
-            performSearch();
-        }
-    }
-    function showSection(sectionId) {
-        document.querySelectorAll('.screen, .login-screen, .register-screen').forEach(el => el.classList.add('hidden'));
-        const target = document.getElementById(sectionId);
-        if (target) target.classList.remove('hidden');
-    }
 
     function scrollToMap() {
         const map = document.getElementById('mall-map');
@@ -1013,8 +741,6 @@
     document.addEventListener('scroll', handler, { passive: true });
 
 </script>
-</html>
-
 @code {
     private int currentIndex = 0;
     private DotNetObjectReference<Vizitors>? dotNetRef;
@@ -1031,16 +757,16 @@
     {
         JS.InvokeVoidAsync("toggleSearchPanel");
     }
-    private async void Prev()
-    {
-        currentIndex = (currentIndex - 1 + floors.Count) % floors.Count;
-        await LoadSvgForFloor(currentIndex + 1); // Этажи начинаются с 1
-    }
+    private int SelectedFloor = 1;
 
-    private async void Next()
+    private async Task OnFloorChanged(ChangeEventArgs e)
     {
-        currentIndex = (currentIndex + 1) % floors.Count;
-        await LoadSvgForFloor(currentIndex + 1);
+        if (int.TryParse(e?.Value?.ToString(), out int floor))
+        {
+            SelectedFloor = floor;
+            await LoadSvgForFloor(SelectedFloor);
+            StateHasChanged(); // если нужно явно перерисовать
+        }
     }
 
     [JSInvokable]
@@ -1090,29 +816,38 @@
                 // Арендованные помещения
                 string fullUrl = GetFullUrl(помещение.СсылкаНаМагазин);
 
-                SvgContent = Regex.Replace(
-                    SvgContent,
-                    $@"(<g[^>]*id=""{id}""[^>]*)",
-                    $"$1 class=\"rented\" onclick=\"window.open('{fullUrl}', '_blank')\"",
-                    RegexOptions.IgnoreCase);
+                if (fullUrl != "0") // Только если есть корректная ссылка
+                {
+                    SvgContent = Regex.Replace(
+                        SvgContent,
+                        $@"(<g[^>]*id=""{id}""[^>]*)",
+                        $"$1 class=\"rented\" onclick=\"window.open('{fullUrl}', '_blank')\"",
+                        RegexOptions.IgnoreCase);
+                }
+                else
+                {
+                    SvgContent = Regex.Replace(
+                        SvgContent,
+                        $@"(<g[^>]*id=""{id}""[^>]*)",
+                        "$1 class=\"rented\"",
+                        RegexOptions.IgnoreCase);
+                }
 
-                // Оставляем иконку как есть (она будет видна благодаря CSS)
+                // Иконка остаётся
             }
             else
             {
-                // Свободные помещения - удаляем группу с иконкой
+                // Свободные помещения — удаляем группу с иконкой
                 SvgContent = Regex.Replace(
                     SvgContent,
                     iconPattern,
                     match =>
                     {
-                        // Сохраняем основную группу Store-XXX, но удаляем внутреннюю группу с иконкой
                         var storeGroup = match.Value;
-                        return storeGroup.Replace(match.Groups[1].Value, ""); // Удаляем группу с иконкой
+                        return storeGroup.Replace(match.Groups[1].Value, ""); // Удаляем иконку
                     },
                     RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
-                // Добавляем класс для помещения
                 SvgContent = Regex.Replace(
                     SvgContent,
                     $@"(<g[^>]*id=""{id}""[^>]*)",
@@ -1123,6 +858,7 @@
 
         StateHasChanged();
     }
+
     private async Task ScrollToMap()
     {
         try
@@ -1140,18 +876,19 @@
         url = url?.Trim(); // Убираем пробелы в начале и конце
 
         if (string.IsNullOrWhiteSpace(url))
-            return "#";
+            return "0"; // Ничего не делать
 
         // Удаляем возможные протоколы и слеши в начале
         url = Regex.Replace(url, "^https?://", "", RegexOptions.IgnoreCase);
         url = url.TrimStart('/');
 
-        // Если URL не содержит точку (значит это не домен), возвращаем #
+        // Если URL не содержит точку (значит это не домен), возвращаем "0"
         if (!url.Contains('.'))
-            return "#";
+            return "0";
 
         return $"https://{url}";
     }
+
     protected override async Task OnInitializedAsync()
     {
         await LoadSvgForFloor(currentIndex + 1);

@@ -25,4 +25,10 @@
     <Folder Include="wwwroot\contracts\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\Documents\project_documentation.docx" />
+    <None Include="wwwroot\Documents\signage_requirements.doc" />
+    <None Include="wwwroot\Documents\tenant_rules.doc" />
+  </ItemGroup>
+
 </Project>

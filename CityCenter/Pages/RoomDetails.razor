@@ -164,10 +164,10 @@
                 <p><strong>Название:</strong> @room.Название</p>
                 <p><strong>Этаж:</strong> @room.Этаж</p>
                 <p><strong>Площадь:</strong> @room.Площадь м²</p>
-                <p><strong>Стоимость аренды:</strong> @room.СтоимостьАренды.ToString("C")</p>
+                <p><strong>Стоимость аренды:</strong> @room.СтоимостьАренды.ToString("N0") руб/мес</p>
                 <p><strong>Описание:</strong> @room.Описание</p>
 
-                <button class="btn" @onclick="GoToPayment">Перейти к оплате</button>
+                <button class="btn" @onclick="GoToPayment">Создать заявку</button>
             </div>
         </div>
     }

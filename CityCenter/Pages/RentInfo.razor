@@ -11,13 +11,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        .page-wrapper {
+            display: flex;
+            flex: 1;
+        }
+
+        .main-content {
+            flex: 1;
+            padding-left: 80px; /* или размер sidebar */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column; /* добавить */
+            min-height: 100vh; /* чтобы body занимал всю высоту экрана */
+            font-family: 'Poppins', sans-serif;
+            color: white;
+        }
+
         /* Общие стили для раздела документов */
         #documents .rent-full {
             font-size: 1.4rem;
             padding: 40px 10vw;
             color: white; /* Белый текст по умолчанию */
         }
-
+        
             #documents .rent-full h1 {
                 font-size: 3rem;
                 margin-bottom: 40px;
@@ -157,14 +177,7 @@
             box-sizing: border-box;
         }
 
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0a0a0a, #1e1e1e);
-            color: white;
-        }
+       
 
         .sidebar {
             width: 80px;
@@ -218,7 +231,7 @@
             }
 
         .rent-full {
-            width: 100vw;
+            width: 100%;
             padding: 80px 10vw;
             box-sizing: border-box;
             background: linear-gradient(135deg, #0a0a0a, #1b1b1b);
@@ -290,46 +303,43 @@
                 margin: 5px 0;
                 font-size: 1.1rem;
             }
-    </style>
-    <script>
-        function showSection(sectionId) {
-            // Скрыть все экраны
-            document.querySelectorAll('.screen').forEach(el => {
-                el.classList.add('hidden');
-            });
 
-            // Показать выбранный экран
-            const target = document.getElementById(sectionId);
-            if (target) {
-                target.classList.remove('hidden');
+        @@keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(10px);
+            }
+
+            60% {
+                transform: translateY(5px);
             }
         }
-
-        // Показать домашнюю страницу по умолчанию
-        document.addEventListener('DOMContentLoaded', function () {
-            showSection('home');
-        });
-    </script>
+    </style>
+   
 </head>
 <body class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
-
+      <div class="page-wrapper">
     <nav class="sidebar">
         <ul>
-            <li onclick="showSection('home')">
+            <li @onclick='() => ShowSection("home")'>
                 <i class="fas fa-store"></i> <span>Аренда</span>
             </li>
 
             <li @onclick="NavigateToReg"><i class="fas fa-id-card"></i> <span>Регистрация</span></li>
-            @*   <li><i class="fas fa-user"></i> <span>Профиль</span></li> *@
-            <!-- Вставьте в <ul> меню: -->
+
             <li @onclick="NavigateToLogin"><i class="fas fa-sign-in-alt"></i> <span>Вход</span></li>
-            <li onclick="showSection('documents')">
+
+            <li @onclick='() => ShowSection("documents")'>
                 <i class="fas fa-file-alt"></i> <span>Документы</span>
             </li>
+
         </ul>
     </nav>
-
-    <div id="home" class="screen">
+      <main class="main-content">
+    <div id="home" class="screen @(currentSection == "home" ? "" : "hidden")">
         <div class="rent-full">
             <h1>Аренда помещений</h1>
 
@@ -354,7 +364,8 @@
         </div>
     </div>
 
-    <div id="documents" class="screen hidden">
+    <div id="documents" class="screen @(currentSection == "documents" ? "" : "hidden")">
+
         <div class="rent-full" style="font-size: 1.4rem; padding: 40px 10vw;">
             <h1>Документы</h1>
 
@@ -362,7 +373,7 @@
             <ul>
                 <li>
                     <a href="./documents/project_documentation.docx" download>
-                        <i class="fas fa-file"></i> Порядок разработки и согласования проектной документации (PDF, 1.2 МБ)
+                        <i class="fas fa-file"></i> Порядок разработки и согласования проектной документации (docx, 1.2 МБ)
                     </a>
                 </li>
                 <li>
@@ -376,8 +387,8 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/documents/responsible_person.docx" download>
-                        <i class="fas fa-file"></i> Памятка о назначении ответственного лица (.docx, 641 Кб)
+                    <a href="/documents/responsible_person.pdf" download>
+                        <i class="fas fa-file"></i> Памятка о назначении ответственного лица (.pdf, 641 Кб)
                     </a>
                 </li>
             </ul>
@@ -400,12 +411,12 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/documents/construction_permit.doc" download>
+                    <a href="/documents/construction_permit.docx" download>
                         <i class="fas fa-file"></i> Акт-допуск на строительно-монтажные работы (.doc, 24.7 Кб)
                     </a>
                 </li>
                 <li>
-                    <a href="/documents/premises_commissioning_act.doc" download>
+                    <a href="/documents/premises_commissioning_act1.docx" download>
                         <i class="fas fa-file"></i> Акт ввода в эксплуатацию арендуемого помещения (.doc, 28 Кб)
                     </a>
                 </li>
@@ -427,7 +438,8 @@
             </ul>
         </div>
     </div>
-
+        </main>
+    </div>
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
@@ -468,10 +480,13 @@
         Navigation.NavigateTo("/registration");
     }
 
-    private async Task ShowSectionAsync(string sectionId)
+    private string currentSection = "home";
+
+    private void ShowSection(string section)
     {
-        await JS.InvokeVoidAsync("showSection", sectionId);
+        currentSection = section;
     }
+
 }
 
 

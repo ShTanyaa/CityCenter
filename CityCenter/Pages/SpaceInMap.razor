@@ -11,18 +11,30 @@
 
 @inject ThemeService ThemeService
 <!DOCTYPE html>
-<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
+<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "dark-theme")">
 <head>
 <style>
-    /* Основные стили (тёмная тема по умолчанию) */
-    body {
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #0a0a0a, #111);
-        color: #fff;
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-        transition: all 0.3s ease;
+    /* Основные стили светлой темы (по умолчанию) */
+        html, body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa, #e4e8eb);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+    .page-wrapper {
+        display: flex;
+        flex: 1;
+        min-height: 100vh;
+    }
+
+    .main-content {
+        flex: 1;
+        padding-left: 80px;
     }
 
     .back-arrow {
@@ -31,15 +43,15 @@
         left: 30px;
         font-size: 2rem;
         cursor: pointer;
-        color: #00aaff;
+        color: #0078d7;
         transition: transform 0.2s ease;
         z-index: 10;
     }
 
-        .back-arrow:hover {
-            transform: scale(1.2);
-            color: #0088cc;
-        }
+    .back-arrow:hover {
+        transform: scale(1.2);
+        color: #005fa3;
+    }
 
     .map-screen {
         display: flex;
@@ -54,8 +66,8 @@
         font-size: 3rem;
         font-weight: bold;
         margin-bottom: 30px;
-        text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.5);
-        color: #00aaff;
+        text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.1);
+        color: #0078d7;
         text-align: center;
     }
 
@@ -68,74 +80,84 @@
         margin-bottom: 40px;
     }
 
+    .svg-container {
+        background-color: #f8f8f8;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
     .svg-container svg {
-        width: 100vw;
-        height: 80vh;
+        width: 100%;
+        height: auto;
+        max-height: 80vh;
     }
 
     .room-info {
-        background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(40, 40, 40, 0.95));
-        padding: 50px;
-        border-radius: 25px;
-        box-shadow: 0 0 40px rgba(0, 170, 255, 0.6);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 245, 245, 0.95));
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 0 30px rgba(0, 120, 215, 0.3);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        font-size: 1.4rem;
-        color: #fff;
+        font-size: 1.3rem;
+        color: #333;
         max-width: 900px;
-        width: 100%;
-        margin: 0 auto;
+        width: 90%;
+        margin: 20px auto;
+        border: 1px solid #e0e0e0;
     }
 
-        .room-info:hover {
-            transform: scale(1.03);
-            box-shadow: 0 0 50px #00aaff;
-        }
+    .room-info:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 40px rgba(0, 120, 215, 0.4);
+    }
 
-        .room-info b {
-            color: #00ffcc;
-        }
+    .room-info b {
+        color: #00a859;
+    }
 
     .btn {
-        margin-top: 30px;
-        padding: 14px 26px;
-        background-color: #00aaff;
+        margin-top: 25px;
+        padding: 12px 24px;
+        background-color: #0078d7;
         border: none;
-        border-radius: 12px;
+        border-radius: 10px;
         color: white;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         cursor: pointer;
-        transition: background 0.3s ease;
+        transition: background 0.3s ease, transform 0.2s ease;
     }
 
-        .btn:hover {
-            background-color: #0088cc;
-        }
+    .btn:hover {
+        background-color: #0066cc;
+        transform: translateY(-2px);
+    }
 
     /* Подсветка выбранного помещения */
     svg .selected {
-        fill: #00ff88 !important;
-        stroke: #00cc77 !important;
-        filter: drop-shadow(0 0 10px #00ff88);
+        fill: #00a859 !important;
+        stroke: #008744 !important;
+        filter: drop-shadow(0 0 10px rgba(0, 168, 89, 0.5));
     }
 
-    /* Подсветка при наведении без сдвига и масштабирования */
+    /* Подсветка при наведении */
     svg g[id^="Store-"]:hover {
         cursor: pointer;
         transition: filter 0.2s ease;
-        filter: drop-shadow(0 0 6px #00aaff);
+        filter: drop-shadow(0 0 6px rgba(0, 120, 215, 0.5));
     }
 
-        svg g[id^="Store-"]:hover rect {
-            fill: rgba(0, 170, 255, 0.15) !important;
-            stroke: #00aaff !important;
-            transition: all 0.3s ease;
-        }
+    svg g[id^="Store-"]:hover rect {
+        fill: rgba(0, 120, 215, 0.15) !important;
+        stroke: #0078d7 !important;
+        transition: all 0.3s ease;
+    }
 
     .svg-disabled {
-        opacity: 0.25;
+        opacity: 0.3;
         pointer-events: none;
         cursor: not-allowed;
-        filter: grayscale(1);
+        filter: grayscale(1) brightness(1.1);
     }
 
     svg g.svg-disabled:hover {
@@ -151,79 +173,224 @@
     }
 
     .floor-selector {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         padding: 10px 20px;
         margin-bottom: 20px;
         border-radius: 10px;
-        border: none;
-        background-color: #1e1e1e;
-        color: white;
-        box-shadow: 0 0 10px #00aaff;
+        border: 1px solid #ddd;
+        background-color: #fff;
+        color: #333;
+        box-shadow: 0 0 10px rgba(0, 120, 215, 0.3);
+        transition: all 0.3s ease;
+        cursor: pointer;
     }
 
-    /* Светлая тема */
-    body.light-theme {
-        background: linear-gradient(135deg, #f5f7fa, #e4e8eb) !important;
-        color: #333 !important;
+    .floor-selector:hover {
+        box-shadow: 0 0 15px rgba(0, 120, 215, 0.4);
     }
 
-    .light-theme .back-arrow {
-        color: #0078d7 !important;
+    /* Сайдбар */
+    .sidebar {
+        width: 80px;
+        background: rgba(245, 245, 245, 0.95);
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        transition: width 0.3s ease;
+        overflow: hidden;
+        padding-top: 80px;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        z-index: 100;
     }
 
-        .light-theme .back-arrow:hover {
-            color: #005fa3 !important;
+    .sidebar:hover {
+        width: 250px;
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar ul li {
+        padding: 15px;
+        color: #444;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .sidebar ul li:hover {
+        background: rgba(0, 0, 0, 0.08);
+    }
+
+    .sidebar ul li i {
+        font-size: 20px;
+        width: 40px;
+        text-align: center;
+        color: #0078d7;
+    }
+
+    .sidebar ul li span {
+        opacity: 0;
+        transition: opacity 0.3s;
+        white-space: nowrap;
+    }
+
+    .sidebar:hover ul li span {
+        opacity: 1;
+    }
+
+        .dark-theme,
+        .dark-theme html,
+        .dark-theme body,
+        .dark-theme .page-wrapper,
+        .dark-theme .main-content {
+            background: linear-gradient(135deg, #0a0a0a, #111) !important;
+            color: #fff !important;
         }
 
-    .light-theme .map-title {
-        color: #0078d7 !important;
-        text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.1) !important;
+            .dark-theme .sidebar {
+                background: rgba(0, 0, 0, 0.9) !important;
+            }
+    .dark-theme .back-arrow {
+        color: #00aaff !important;
     }
 
-    .light-theme .room-info {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 245, 245, 0.95)) !important;
-        color: #333 !important;
-        box-shadow: 0 0 40px rgba(0, 120, 215, 0.4) !important;
-        border: 1px solid #e0e0e0 !important;
+    .dark-theme .back-arrow:hover {
+        color: #0088cc !important;
     }
 
-        .light-theme .room-info:hover {
-            box-shadow: 0 0 50px rgba(0, 120, 215, 0.6) !important;
-        }
+    .dark-theme .map-title {
+        color: #00aaff !important;
+        text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.5) !important;
+    }
 
-        .light-theme .room-info b {
-            color: #00a859 !important;
-        }
+    .dark-theme .svg-container {
+        background-color: #121212 !important;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5) !important;
+    }
 
-    .light-theme .btn {
-        background-color: #0078d7 !important;
+    .dark-theme .room-info {
+        background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(40, 40, 40, 0.95)) !important;
+        color: #fff !important;
+        box-shadow: 0 0 40px rgba(0, 170, 255, 0.6) !important;
+        border: none !important;
+    }
+
+    .dark-theme .room-info b {
+        color: #00ffcc !important;
+    }
+
+    .dark-theme .btn {
+        background-color: #00aaff !important;
+    }
+
+    .dark-theme .btn:hover {
+        background-color: #0088cc !important;
+    }
+
+    .dark-theme svg .selected {
+        fill: #00ff88 !important;
+        stroke: #00cc77 !important;
+        filter: drop-shadow(0 0 10px #00ff88) !important;
+    }
+
+    .dark-theme svg g[id^="Store-"]:hover {
+        filter: drop-shadow(0 0 6px #00aaff) !important;
+    }
+
+    .dark-theme svg g[id^="Store-"]:hover rect {
+        fill: rgba(0, 170, 255, 0.15) !important;
+        stroke: #00aaff !important;
+    }
+
+    .dark-theme .floor-selector {
+        background-color: #1e1e1e !important;
+        color: white !important;
+        box-shadow: 0 0 10px #00aaff !important;
+        border: none !important;
+    }
+
+    .dark-theme .sidebar {
+        background: rgba(0, 0, 0, 0.9) !important;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.8) !important;
+    }
+
+    .dark-theme .sidebar ul li {
         color: white !important;
     }
 
-        .light-theme .btn:hover {
-            background-color: #0066cc !important;
-        }
-
-    .light-theme svg .selected {
-        fill: #00a859 !important;
-        stroke: #008744 !important;
-        filter: drop-shadow(0 0 10px #00a859) !important;
+    .dark-theme .sidebar ul li:hover {
+        background: rgba(255, 255, 255, 0.2) !important;
     }
 
-    .light-theme svg g[id^="Store-"]:hover {
-        filter: drop-shadow(0 0 6px #0078d7) !important;
+    .dark-theme .sidebar ul li i {
+        color: #00aaff !important;
     }
 
-        .light-theme svg g[id^="Store-"]:hover rect {
-            fill: rgba(0, 120, 215, 0.15) !important;
-            stroke: #0078d7 !important;
+    /* Адаптация для мобильных устройств */
+    @@media (max-width: 768px) {
+        .map-title {
+            font-size: 2rem;
+            margin-top: 60px;
         }
 
-    .light-theme .floor-selector {
-        background-color: #fff !important;
-        color: #333 !important;
-        box-shadow: 0 0 10px rgba(0, 120, 215, 0.5) !important;
-        border: 1px solid #ddd !important;
+        .room-info {
+            padding: 25px;
+            font-size: 1.1rem;
+            width: 95%;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 1rem;
+        }
+
+        .floor-selector {
+            font-size: 1rem;
+            padding: 8px 15px;
+        }
+
+        .main-content {
+            padding-left: 0;
+        }
+
+        .sidebar {
+            width: 60px;
+            padding-top: 60px;
+        }
+
+        .sidebar:hover {
+            width: 200px;
+        }
+
+        .sidebar ul li {
+            padding: 12px;
+        }
+
+        .sidebar ul li i {
+            font-size: 18px;
+            width: 30px;
+        }
+    }
+
+   @@media (max-width: 480px) {
+        .map-title {
+            font-size: 1.8rem;
+        }
+
+        .room-info {
+            padding: 20px;
+            font-size: 1rem;
+        }
+
+        .svg-container svg {
+            height: 60vh;
+        }
     }
 </style>
 </head>
@@ -255,7 +422,7 @@
             <h3>Помещение @SelectedRoom.Название</h3>
             <p><b>Этаж:</b> @SelectedRoom.Этаж</p>
             <p><b>Площадь:</b> @SelectedRoom.Площадь м²</p>
-            <p><b>Стоимость аренды:</b> @SelectedRoom.СтоимостьАренды.ToString("C")</p>
+                <p><b>Стоимость аренды:</b> @SelectedRoom.СтоимостьАренды.ToString("N0") руб/мес</p>
             <button class="btn" @onclick='() => GoToRoomDetails(SelectedRoom.IdПомещения)'>Арендовать</button>
         </div>
     }

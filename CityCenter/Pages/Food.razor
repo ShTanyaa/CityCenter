@@ -8,6 +8,15 @@
 <html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
 <head>
 <style>
+        .no-photo-placeholder {
+            height: 100%;
+            background: linear-gradient(135deg, #333, #444);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-size: 1rem;
+        }
     .cafes-screen {
         padding: 60px 30px;
         font-family: 'Poppins', sans-serif;
@@ -170,27 +179,30 @@
             @foreach (var cafe in Cafes)
             {
                 <div class="cafe-card">
-                    <div class="cafe-card-img-container">
-                        @if (!string.IsNullOrWhiteSpace(cafe.Фото))
-                        {
-                            <img src="@cafe.Фото" alt="Фото кафе" />
-                        }
-                        else
-                        {
-                            <div class="no-photo-placeholder">
-                                Фото отсутствует
-                            </div>
-                        }
-                    </div>
+                        <div class="shop-card-img-container">
+                            @if (!string.IsNullOrWhiteSpace(cafe.СсылкаНаМагазин))
+                            {
+                                var siteUrl = GetFullUrl(cafe.СсылкаНаМагазин);
+                                var faviconUrl = $"https://www.google.com/s2/favicons?sz=128&domain_url={siteUrl}";
+                                <img src="@faviconUrl"
+                                     alt="Логотип сайта"
+                                     onerror="this.onerror=null; this.src='/images/placeholder.png';" />
+                            }
+                            else
+                            {
+                                <div class="no-photo-placeholder">
+                                    Фото отсутствует
+                                </div>
+                            }
+                        </div>
 
                     <div class="cafe-card-content">
                         <h3>@cafe.Название</h3>
                         <p><strong>Этаж:</strong> @cafe.Этаж</p>
-                        <p><strong>Тип кухни:</strong> @cafe.ТипКухни</p>
 
-                        @if (!string.IsNullOrWhiteSpace(cafe.Ссылка))
+                        @if (!string.IsNullOrWhiteSpace(cafe.СсылкаНаМагазин))
                         {
-                            <a href="@GetFullUrl(cafe.Ссылка)" target="_blank" class="cafe-card-link">
+                                <a href="@GetFullUrl(cafe.СсылкаНаМагазин)" target="_blank" class="cafe-card-link">
                                 🍽️ Посмотреть меню
                             </a>
                         }
@@ -215,14 +227,13 @@
     protected override async Task OnInitializedAsync()
     {
         Cafes = await Db.Помещенияs
-            .Where(p => p.IdНазначения == 10) // ID 10 - кафе и рестораны
+            .Where(p => p.IdНазначения == 2) // ID 10 - кафе и рестораны
             .Select(p => new CafeInfo
                 {
                     Название = p.Название,
                     Этаж = p.Этаж,
                     Фото = p.Фото,
-                    Ссылка = p.СсылкаНаМагазин,
-                    ТипКухни = p.Описание ?? "Разнообразная кухня"
+                    СсылкаНаМагазин = p.СсылкаНаМагазин
                 })
             .ToListAsync();
     }
@@ -244,7 +255,6 @@
         public string Название { get; set; }
         public int Этаж { get; set; }
         public string Фото { get; set; }
-        public string? Ссылка { get; set; }
-        public string ТипКухни { get; set; }
+        public string? СсылкаНаМагазин { get; set; }
     }
 }

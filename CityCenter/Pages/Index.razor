@@ -7,70 +7,89 @@
 
 
 <style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+        overflow-x: clip;
+        outline: none !important;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
     .welcome-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-        padding: 40px;
+        padding: 20px;
         text-align: center;
-        background: linear-gradient(135deg, #0a0a0a, #1e1e1e);
+        background: linear-gradient(135deg, #f0f0f0, #e0e0e0); /* Светлый градиент по умолчанию */
         transition: all 0.3s ease;
+        overflow: hidden;
+        box-sizing: border-box;
     }
 
-        .welcome-screen.light-theme {
-            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+        .welcome-screen.dark-theme {
+            background: linear-gradient(135deg, #0a0a0a, #1e1e1e); /* Темный градиент теперь для класса dark-theme */
         }
 
     .welcome-title {
         font-size: 3.5rem;
         margin-bottom: 40px;
-        color: #00aaff;
-        text-shadow: 2px 2px 12px rgba(0,0,0,0.7);
+        color: #0066cc; /* Светлый вариант цвета по умолчанию */
+        text-shadow: 2px 2px 12px rgba(0,0,0,0.2);
         transition: all 0.3s ease;
     }
 
-    .light-theme .welcome-title {
-        color: #0066cc;
-        text-shadow: 2px 2px 12px rgba(0,0,0,0.2);
+    .dark-theme .welcome-title {
+        color: #00aaff; /* Темный вариант цвета */
+        text-shadow: 2px 2px 12px rgba(0,0,0,0.7);
     }
 
     .welcome-options {
         display: flex;
-        flex-direction: row;
+        flex-wrap: wrap;
         justify-content: center;
-        gap: 50px;
+        gap: 30px;
+        max-width: 1200px;
+        width: 100%;
     }
 
     .option-card {
-        width: 400px;
+        flex: 1 1 300px;
+        max-width: 400px;
         padding: 40px 30px;
         border-radius: 20px;
-        background: linear-gradient(135deg, rgba(0, 0, 0, 1), rgba(40, 40, 40, 0.6));
-        color: white;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(220, 220, 220, 0.8)); /* Светлый фон по умолчанию */
+        color: #333; /* Темный текст по умолчанию */
         font-size: 1.3rem;
-        box-shadow: 0 0 12px rgba(0, 0, 0, 0.8);
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.2); /* Более светлая тень */
         cursor: pointer;
         transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
         text-align: center;
     }
 
-    .light-theme .option-card {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(220, 220, 220, 0.8));
-        color: #333;
-        box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+    .dark-theme .option-card {
+        background: linear-gradient(135deg, rgba(0, 0, 0, 1), rgba(40, 40, 40, 0.6)); /* Темный фон */
+        color: white; /* Белый текст */
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.8); /* Более темная тень */
     }
 
     .option-card:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 20px #00aaff;
-        background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 100, 150, 0.5));
+        transform: scale(1.03);
+        box-shadow: 0 0 20px #0066cc; /* Светлый вариант подсветки по умолчанию */
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(200, 230, 255, 0.8));
     }
 
-    .light-theme .option-card:hover {
-        box-shadow: 0 0 20px #0066cc;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(200, 230, 255, 0.8));
+    .dark-theme .option-card:hover {
+        box-shadow: 0 0 20px #00aaff; /* Темный вариант подсветки */
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(0, 100, 150, 0.5));
     }
 
     .option-card h2 {
@@ -87,31 +106,33 @@
         position: absolute;
         top: 20px;
         right: 20px;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(255, 255, 255, 0.7); /* Светлый фон по умолчанию */
         border: none;
-        color: white;
+        color: #333; /* Темный текст по умолчанию */
         padding: 10px 15px;
         border-radius: 20px;
         cursor: pointer;
         transition: all 0.3s ease;
+        z-index: 10;
     }
 
-    .light-theme .theme-toggle {
-        background: rgba(255, 255, 255, 0.7);
-        color: #333;
+    .dark-theme .theme-toggle {
+        background: rgba(0, 0, 0, 0.5); /* Темный фон */
+        color: white; /* Белый текст */
     }
 
     .theme-toggle:hover {
-        background: #00aaff;
+        background: #0066cc; /* Светлый вариант hover по умолчанию */
+        color: white;
     }
 
-    .light-theme .theme-toggle:hover {
-        background: #0066cc;
-        color: white;
+    .dark-theme .theme-toggle:hover {
+        background: #00aaff; /* Темный вариант hover */
     }
 </style>
 
-<div class="welcome-screen @(ThemeService.IsLightTheme ? "light-theme" : "")">
+
+<div class="welcome-screen @(!ThemeService.IsLightTheme ? "dark-theme" : "")">
     <button class="theme-toggle" @onclick="ToggleTheme">
         @(ThemeService.IsLightTheme ? "Тёмная тема" : "Светлая тема")
     </button>
@@ -131,8 +152,6 @@
 </div>
 
 @code {
-    private bool isLightTheme = false;
-
     private void ToggleTheme()
     {
         ThemeService.IsLightTheme = !ThemeService.IsLightTheme;

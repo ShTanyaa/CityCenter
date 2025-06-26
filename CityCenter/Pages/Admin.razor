@@ -6,18 +6,18 @@
 @inject NavigationManager NavigationManager
 @inject AppDbContext Db
 @inject ThemeService ThemeService
-<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
+<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "dark-theme")">
 <head>
-
     <style>
-        /* Общие стили */
+        /* Общие стили (светлая тема по умолчанию) */
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0a0a0a, #111);
-            color: #fff;
+            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+            color: #333;
             margin: 0;
             padding: 0;
             min-height: 100vh;
+            transition: all 0.3s ease;
         }
 
         .admin-screen {
@@ -25,116 +25,35 @@
             flex-direction: column;
             align-items: center;
             padding: 60px 40px;
-            background: inherit; /* Важно: наследует фон от body */
-        }
-
-        /* Светлая тема */
-        body.light-theme {
+            min-height: calc(100vh - 120px);
             background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
-            color: #333;
-        }
-
-        .light-theme .admin-screen {
-            background: transparent; /* Прозрачный фон, чтобы показать градиент body */
-        }
-
-        .light-theme h2 {
-            color: #222;
-            text-shadow: none;
-        }
-
-        .light-theme .form-control {
-            background-color: #fff;
-            color: #333;
-            border: 1px solid #ddd;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-            .light-theme .form-control:focus {
-                box-shadow: 0 0 10px rgba(0, 120, 215, 0.5);
-            }
-
-        .light-theme .btn {
-            background: #0078d7;
-            color: white;
-        }
-
-            .light-theme .btn:hover {
-                background: #0066cc;
-                box-shadow: 0 0 10px rgba(0, 120, 215, 0.5);
-            }
-
-        .light-theme .card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 245, 245, 0.95));
-            color: #333;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
-
-            .light-theme .card:hover {
-                box-shadow: 0 0 30px rgba(0, 120, 215, 0.3);
-            }
-
-        .light-theme .tab-item {
-            background-color: #e0e0e0;
-            color: #555;
-        }
-
-            .light-theme .tab-item.active,
-            .light-theme .tab-item:hover {
-                background-color: #0078d7;
-                color: #fff;
-            }
-
-        .light-theme .delete-btn {
-            background-color: #aaa;
-            color: #fff;
-        }
-
-        /* Остальные стили */
-        .application-card {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 520px;
-        }
-
-        .card-content {
-            flex-grow: 1;
-        }
-
-        .delete-btn {
-            background-color: #777;
-            margin-top: auto;
-            margin-top: 20px;
-        }
-
-        button.btn::after {
-            margin-left: 8px;
         }
 
         h2 {
             font-size: 3rem;
             margin-bottom: 30px;
-            color: #fff;
-            text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.5);
+            color: #222;
+            text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.1);
         }
 
         .form-control {
             padding: 22px;
             font-size: 1.4rem;
             border-radius: 12px;
-            border: none;
+            border: 1px solid #ddd;
             margin-bottom: 25px;
             width: 100%;
             max-width: 600px;
-            background-color: #1e1e1e;
-            color: #fff;
+            background-color: #fff;
+            color: #333;
             transition: box-shadow 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
             .form-control:focus {
                 outline: none;
-                box-shadow: 0 0 10px #00aaff;
+                box-shadow: 0 0 10px rgba(0, 120, 215, 0.5);
+                border-color: #0078d7;
             }
 
         .btn {
@@ -143,16 +62,16 @@
             border: none;
             border-radius: 12px;
             cursor: pointer;
-            background: #00aaff;
+            background: #0078d7;
             color: white;
             margin-bottom: 30px;
-            transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.3s ease;
         }
 
             .btn:hover {
-                background: #0088cc;
+                background: #0066cc;
                 transform: scale(1.03);
-                box-shadow: 0 0 10px #00aaff;
+                box-shadow: 0 0 10px rgba(0, 120, 215, 0.5);
             }
 
         .btn-small {
@@ -174,23 +93,25 @@
         }
 
         .card {
-            background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(40, 40, 40, 0.95));
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 245, 245, 0.95));
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
             font-size: 1.3rem;
-            color: #fff;
+            color: #333;
+            border: 1px solid #e0e0e0;
         }
 
             .card:hover {
                 transform: scale(1.05);
-                box-shadow: 0 0 30px #00aaff;
+                box-shadow: 0 0 30px rgba(0, 120, 215, 0.3);
             }
 
             .card h4 {
                 margin-bottom: 12px;
                 font-size: 1.6rem;
+                color: #222;
             }
 
         .tabs {
@@ -203,77 +124,211 @@
             padding: 12px 24px;
             font-size: 1.2rem;
             border-radius: 10px;
-            background-color: #2c2c2c;
-            color: #ccc;
+            background-color: #e0e0e0;
+            color: #555;
             cursor: pointer;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
             .tab-item.active, .tab-item:hover {
+                background-color: #0078d7;
+                color: #fff;
+            }
+
+        /* Темная тема */
+        body.dark-theme {
+            background: linear-gradient(135deg, #0a0a0a, #111);
+            color: #fff;
+        }
+
+        .dark-theme .admin-screen {
+            background: linear-gradient(135deg, #0a0a0a, #111);
+        }
+
+        .dark-theme h2 {
+            color: #fff;
+            text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        .dark-theme .form-control {
+            background-color: #1e1e1e;
+            color: #fff;
+            border: none;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+
+            .dark-theme .form-control:focus {
+                box-shadow: 0 0 10px #00aaff;
+            }
+
+        .dark-theme .btn {
+            background: #00aaff;
+        }
+
+        .dark-theme .card h4 {
+            margin-bottom: 12px;
+            font-size: 1.6rem;
+            color: #fff;
+        }
+            .dark-theme .btn:hover {
+                background: #0088cc;
+                box-shadow: 0 0 10px #00aaff;
+            }
+
+        .dark-theme .card {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.95), rgba(40, 40, 40, 0.95));
+            color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            border: none;
+        }
+
+            .dark-theme .card:hover {
+                box-shadow: 0 0 30px #00aaff;
+            }
+
+        .dark-theme .tab-item {
+            background-color: #2c2c2c;
+            color: #ccc;
+        }
+
+            .dark-theme .tab-item.active,
+            .dark-theme .tab-item:hover {
                 background-color: #00aaff;
                 color: #fff;
             }
-    </style>
-</head>
-<body class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
-<ErrorBoundary>
-<div class="admin-screen">
-    <h2>Админ-панель</h2>
 
-    <div class="tabs">
-        <div class="tab-item @(activeTab == "rooms" ? "active" : "")" @onclick='() => SetTab("rooms")'>Помещения</div>
-        <div class="tab-item @(activeTab == "renters" ? "active" : "")" @onclick='() => SetTab("renters")'>Арендаторы</div>
-        <div class="tab-item @(activeTab == "requests" ? "active" : "")" @onclick='() => SetTab("requests")'>Заявки</div>
-    </div>
-
-  @if (activeTab == "rooms")
-{
-    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px;">
-        <input type="text" class="form-control" placeholder="Поиск по помещениям..." @bind="searchTerm" />
-        <button class="btn" style="margin-left: 20px; white-space: nowrap;" @onclick="GoToAddRoom">
-            ➕ Добавить помещение
-        </button>
-    </div>
-
-
-        @if (!string.IsNullOrEmpty(Message))
-        {
-            <div class="message" style="color:@(IsError ? "#ff6b6b" : "#4caf50")">@Message</div>
+        /* Специфические стили */
+        .application-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 520px;
         }
 
-        <div class="grid">
-            @foreach (var room in FilteredRooms)
+        .card-content {
+            flex-grow: 1;
+        }
+
+        .delete-btn {
+            background-color: #aaa;
+            margin-top: auto;
+            margin-top: 20px;
+        }
+
+        .dark-theme .delete-btn {
+            background-color: #777;
+        }
+
+        .card-image-placeholder {
+            width: 100%;
+            height: 160px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+        }
+
+        .dark-theme .card-image-placeholder {
+            background: #333;
+            color: #aaa;
+        }
+
+        /* Модальное окно */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-image {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff4c4c;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="@(ThemeService.IsLightTheme ? "light-theme" : "dark-theme")">
+    <ErrorBoundary>
+        <div class="admin-screen">
+            <!-- Остальной код остается без изменений -->
+            <h2>Админ-панель</h2>
+
+            <div class="tabs">
+                <div class="tab-item @(activeTab == "rooms" ? "active" : "")" @onclick='() => SetTab("rooms")'>Помещения</div>
+                <div class="tab-item @(activeTab == "renters" ? "active" : "")" @onclick='() => SetTab("renters")'>Арендаторы</div>
+                <div class="tab-item @(activeTab == "requests" ? "active" : "")" @onclick='() => SetTab("requests")'>Заявки</div>
+            </div>
+
+            @if (activeTab == "rooms")
             {
-                <div class="card">
-                    @if (!string.IsNullOrWhiteSpace(room.Фото))
-                    {
-                        <img src="@room.Фото" alt="Фото помещения"
-                             style="width: 100%; max-height: 160px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;" />
-                    }
-                    else
-                    {
-                        <div style="width: 100%; height: 160px; background: #333; border-radius: 10px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; color: #aaa;">
-                            Фото отсутствует
-                        </div>
-                    }
-
-                    <h4>@room.Название</h4>
-                    <p>Этаж: @room.Этаж</p>
-                        <p>Расположение: @room.Расположение</p>
-                    <p>Площадь: @room.Площадь м²</p>
-                    <p>Статус: @(room.ДоступноДляАренды ? "Доступно" : "Занято")</p>
-
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
-                            <button class="btn btn-small" @onclick="() => EditRoom(room.IdПомещения)">✏️Редактировать</button>
-                            <button class="btn" style="background-color: #777;" @onclick="() => DeleteRoom(room.IdПомещения)">🗑 Удалить</button>
-                    </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px;">
+                    <input type="text" class="form-control" placeholder="Поиск по помещениям..." @bind="searchTerm" />
+                    <button class="btn" style="margin-left: 20px; white-space: nowrap;" @onclick="GoToAddRoom">
+                        ➕ Добавить помещение
+                    </button>
                 </div>
 
+                @if (!string.IsNullOrEmpty(Message))
+                {
+                    <div class="message" style="color:@(IsError ? "#ff6b6b" : "#4caf50")">@Message</div>
+                }
 
+                <div class="grid">
+                    @foreach (var room in FilteredRooms)
+                    {
+                        <div class="card">
+                            @if (!string.IsNullOrWhiteSpace(room.Фото))
+                            {
+                                <img src="@room.Фото" alt="Фото помещения"
+                                     style="width: 100%; max-height: 160px; object-fit: cover; border-radius: 10px; margin-bottom: 15px;" />
+                            }
+                            else
+                            {
+                                <div class="card-image-placeholder">
+                                    Фото отсутствует
+                                </div>
+                            }
 
+                            <h4>@room.Название</h4>
+                            <p>Этаж: @room.Этаж</p>
+                            <p>Расположение: @room.Расположение</p>
+                            <p>Площадь: @room.Площадь м²</p>
+                            <p>Стоимость: @room.СтоимостьАренды.ToString("N0") руб/мес</p>
+                            <p>Статус: @(room.ДоступноДляАренды ? "Доступно" : "Занято")</p>
+
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                                <button class="btn btn-small" @onclick="() => EditRoom(room.IdПомещения)">✏️Редактировать</button>
+                                <button class="btn delete-btn" @onclick="() => DeleteRoom(room.IdПомещения)">🗑 Удалить</button>
+                            </div>
+                        </div>
+                    }
+                </div>
             }
-        </div>
-    }
+
     else if (activeTab == "renters")
     {
         <div class="grid">
@@ -332,41 +387,75 @@
                             <div class="card-content">
                                 <h4>Заявка №@app.ID_Заявки</h4>
                                 <p>Пользователь: @UserNames.GetValueOrDefault(app.ID_Пользователя, "Неизвестный")</p>
+                                    <p>
+                                        Email:
+                                        @{
+                                            var email = UserEmails.GetValueOrDefault(app.ID_Пользователя);
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(email))
+                                        {
+                                            <a href="mailto:@email" style="color: #007bff; text-decoration: underline;">@email</a>
+                                        }
+                                        else
+                                        {
+                                            <span style="color: gray;">Не указан</span>
+                                        }
+                                    </p>
+
                                 <p>Помещение: @RoomNames.GetValueOrDefault(app.ID_Помещения, "Удалено")</p>
                                 <p>Дата заявки: @app.ДатаЗаявки.ToShortDateString()</p>
-                                <p>Комментарий: @app.Комментарий</p>
+                                <p>@app.Комментарий</p>
                                 <p>Статус: @app.Статус</p>
 
-                                @if (!string.IsNullOrWhiteSpace(app.ФотоОплаты))
-                                {
-                                    <div style="position: relative;">
-                                        <!-- Маленькое превью -->
-                                        <img src="@app.ФотоОплаты"
-                                             alt="Скрин оплаты"
-                                             style="width: 100%;
-                                            max-height: 200px;
-                                            object-fit: contain;
-                                            margin-top: 10px;
-                                            border-radius: 10px;
-                                            cursor: pointer;"
-                                             @onclick="() => ShowFullImage(app.ФотоОплаты)" />
+                                    @if (!string.IsNullOrWhiteSpace(app.ФотоОплаты))
+                                    {
+                                        var ext = Path.GetExtension(app.ФотоОплаты).ToLower();
 
-                                        <!-- Иконка лупы для наглядности -->
-                                        <div style="position: absolute;
-                                            top: 20px;
-                                            right: 20px;
-                                            background: rgba(0,0,0,0.7);
-                                            width: 30px;
-                                            height: 30px;
-                                            border-radius: 50%;
-                                            display: flex;
-                                            align-items: center;
-                                            justify-content: center;
-                                            pointer-events: none;">
-                                            🔍
-                                        </div>
-                                    </div>
-                                }
+                                        if (ext == ".jpg" || ext == ".jpeg" || ext == ".png")
+                                        {
+                                            <div style="position: relative;">
+                                                <img src="@app.ФотоОплаты"
+                                                     alt="Документ/Фото"
+                                                     style="width: 100%;
+                        max-height: 200px;
+                        object-fit: contain;
+                        margin-top: 10px;
+                        border-radius: 10px;
+                        cursor: pointer;"
+                                                     @onclick="() => ShowFullImage(app.ФотоОплаты)" />
+
+                                                <div style="position: absolute;
+                        top: 20px;
+                        right: 20px;
+                        background: rgba(0,0,0,0.7);
+                        width: 30px;
+                        height: 30px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        pointer-events: none;">
+                                                    🔍
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (ext == ".pdf" || ext == ".doc" || ext == ".docx")
+                                        {
+                                            <p style="margin-top: 10px;">
+                                                📎 Документ:
+                                                <a href="@app.ФотоОплаты"
+                                                   target="_blank"
+                                                   style="color: #007bff; text-decoration: underline;">
+                                                    Открыть @ext.ToUpper().TrimStart('.')
+                                                </a>
+                                            </p>
+                                        }
+                                        else
+                                        {
+                                            <p style="color: gray;">📄 Формат не поддерживается для просмотра</p>
+                                        }
+                                    }
+
 
                                 @if (app.Статус == "В обработке")
                                 {
@@ -447,6 +536,7 @@
 
     private Dictionary<int, string> UserNames = new();
     private Dictionary<int, string> RoomNames = new();
+    private Dictionary<int, string> UserEmails = new();
     private List<Аренда> AllRents = new();
 
 
@@ -539,6 +629,7 @@
             .ToListAsync();
 
         UserNames = users.ToDictionary(u => u.IdПользователя, u => u.Фио);
+        UserEmails = users.ToDictionary(u => u.IdПользователя, u => u.Email);
         RoomNames = rooms.ToDictionary(r => r.IdПомещения, r => r.Название);
     }
 
@@ -612,35 +703,6 @@
                         .FirstOrDefaultAsync(a =>
                             a.IdАрендатора == арендатор.IdАрендатора &&
                             a.IdПомещения == app.ID_Помещения);
-
-                    // if (аренда1 != null)
-                    // {
-                    //     string fileName = Guid.NewGuid() + ".pdf";
-                    //     string filePath = Path.Combine(Env.WebRootPath, "contracts", fileName);
-                    //     Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
-
-                    //         string текст = "ДОГОВОР АРЕНДЫ\n\n" +
-                    //     $"Арендатор: {UserNames[app.ID_Пользователя]}\n" +
-                    //     $"Помещение: {RoomNames[app.ID_Помещения]}\n" +
-                    //     $"Площадь: {аренда1.IdПомещенияNavigation.Площадь} м²\n" +
-                    //     $"Этаж: {аренда1.IdПомещенияNavigation.Этаж}\n\n" +
-                    //     $"Дата начала: {аренда1.ДатаНачала:d}\n" +
-                    //     $"Дата окончания: {аренда1.ДатаОкончания:d}\n\n" +
-                    //     "Настоящим подтверждается аренда помещения сроком на месяц.";
-
-
-                    //     QuestPDF.Fluent.Document.Create(container =>
-                    //     {
-                    //         container.Page(page =>
-                    //         {
-                    //             page.Margin(50);
-                    //             page.Content().Text(текст).FontSize(14);
-                    //         });
-                    //     }).GeneratePdf(filePath);
-
-                    //     app.Комментарий += $"\n[Договор] /contracts/{fileName}";
-                    //     await Db.SaveChangesAsync();
-                    // }
                 }
             }
 

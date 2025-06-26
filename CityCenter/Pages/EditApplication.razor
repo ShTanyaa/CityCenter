@@ -1,0 +1,344 @@
+﻿@page "/edit-application/{id:int}"
+@using CityCenter.Data
+@using CityCenter.Models
+@using Microsoft.EntityFrameworkCore
+@inject NavigationManager NavigationManager
+@inject AppDbContext Db
+@inject IJSRuntime JSRuntime
+@inject IWebHostEnvironment Env
+@inject ThemeService ThemeService
+
+<!DOCTYPE html>
+<html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "dark-theme")">
+<head>
+<style>
+    /* Базовые стили (общие для обеих тем) */
+    .back-arrow {
+        position: absolute;
+        top: 30px;
+        left: 30px;
+        font-size: 2rem;
+        cursor: pointer;
+        color: #00aaff;
+        z-index: 10;
+        transition: color 0.3s ease;
+    }
+
+    .back-arrow:hover {
+        color: #0088cc;
+    }
+
+    .edit-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 60px 40px;
+        font-family: 'Poppins', sans-serif;
+        min-height: 100vh;
+    }
+
+    .form-control {
+        padding: 18px;
+        font-size: 1.2rem;
+        border-radius: 10px;
+        border: none;
+        margin-bottom: 15px;
+        width: 100%;
+        max-width: 600px;
+        transition: all 0.3s ease;
+    }
+
+    .btn {
+        padding: 14px 28px;
+        font-size: 1.2rem;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        background: #00aaff;
+        color: white;
+        margin-top: 20px;
+        transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+        background: #0088cc;
+    }
+
+    .message {
+        margin-top: 15px;
+        color: #4caf50;
+    }
+
+    .card {
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        width: 100%;
+        max-width: 600px;
+        transition: all 0.3s ease;
+    }
+
+    .card p {
+        margin: 8px 0;
+        font-size: 1.1rem;
+    }
+
+    /* Светлая тема (по умолчанию) */
+    :root, .light-theme {
+        --bg-color: #f5f5f5;
+        --text-color: #333;
+        --card-bg: #ffffff;
+        --card-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        --input-bg: #ffffff;
+        --input-border: 1px solid #ddd;
+        --input-text: #333;
+        --input-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .light-theme .edit-screen {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+    }
+
+    .light-theme .form-control {
+        background-color: var(--input-bg);
+        color: var(--input-text);
+        border: var(--input-border);
+        box-shadow: var(--input-shadow);
+    }
+
+    .light-theme .card {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        box-shadow: var(--card-shadow);
+    }
+
+    /* Темная тема */
+    .dark-theme {
+        --bg-color: #121212;
+        --text-color: #ffffff;
+        --card-bg: #2c2c2c;
+        --card-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        --input-bg: #1e1e1e;
+        --input-border: none;
+        --input-text: #ffffff;
+        --input-shadow: none;
+    }
+
+    .dark-theme .edit-screen {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+    }
+
+    .dark-theme .form-control {
+        background-color: var(--input-bg);
+        color: var(--input-text);
+        border: var(--input-border);
+        box-shadow: var(--input-shadow);
+    }
+
+    .dark-theme .card {
+        background-color: var(--card-bg);
+        color: var(--text-color);
+        box-shadow: var(--card-shadow);
+    }
+
+    /* Адаптация для мобильных устройств */
+    @@media (max-width: 768px) {
+        .edit-screen {
+            padding: 40px 20px;
+        }
+        
+        .form-control {
+            padding: 14px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            font-size: 1rem;
+        }
+    }
+</style>
+
+</head>
+<body class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
+    <div class="edit-screen">
+        <div class="back-arrow" @onclick="GoBack">←</div>
+        <h2>Редактировать заявку</h2>
+        @if (room == null)
+        {
+            <p>Загрузка информации о помещении...</p>
+        }
+        else
+        {
+            <div class="card">
+                <p><strong>Название:</strong> @room.Название</p>
+                <p><strong>Этаж:</strong> @room.Этаж</p>
+                <p><strong>Площадь:</strong> @room.Площадь м²</p>
+                <p><strong>Стоимость аренды:</strong> @room.СтоимостьАренды.ToString("N0") руб/мес</p>
+            </div>
+        }
+        @if (application != null)
+        {
+            <select class="form-control" @bind="IdДеятельности">
+                <option value="">-- Выберите вид деятельности --</option>
+                @foreach (var activity in Activities)
+                {
+                    <option value="@activity.IdДеятельности">@activity.Название</option>
+                }
+            </select>
+
+            <textarea class="form-control" @bind="Комментарий" placeholder="Комментарий"></textarea>
+
+            <InputFile OnChange="HandleFileUpload" accept="image/*,.pdf,.doc,.docx" />
+            @if (!string.IsNullOrEmpty(application.ФотоОплаты))
+            {
+                <p>Текущее вложение:</p>
+                @if (IsImage(application.ФотоОплаты))
+                {
+                    <img src="@application.ФотоОплаты" style="max-width: 300px; border-radius: 10px;" />
+                }
+                else
+                {
+                    <a href="@application.ФотоОплаты" target="_blank">Открыть файл</a>
+                }
+            }
+
+            <button class="btn" @onclick="SaveChanges">💾 Сохранить</button>
+
+            @if (!string.IsNullOrWhiteSpace(Message))
+            {
+                <div class="message">@Message</div>
+            }
+        }
+
+        else
+        {
+            <p>Загрузка данных...</p>
+        }
+    </div>
+</body>
+</html>
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    [Parameter] public int roomId { get; set; }
+
+    private Помещения? room;
+
+    private ЗаявкаНаАренду? application;
+    private IBrowserFile? UploadedFile;
+    private string? Message;
+
+    private int? IdДеятельности;
+    private string? Комментарий = ""; // Изначально пустое поле
+    private List<ВидДеятельности> Activities = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        application = await Db.ЗаявкиНаАренду.FindAsync(id);
+
+        if (application != null)
+        {
+            room = await Db.Помещенияs.FindAsync(application.ID_Помещения);
+            Activities = await Db.ВидДеятельностиs.ToListAsync();
+
+            // Попытка извлечь вид деятельности из комментария
+            var commentLines = application.Комментарий?.Split('\n', 2);
+            if (commentLines?.Length > 0 && commentLines[0].StartsWith("Вид деятельности: "))
+            {
+                var name = commentLines[0].Replace("Вид деятельности: ", "");
+                var found = Activities.FirstOrDefault(a => a.Название == name);
+                if (found != null) IdДеятельности = found.IdДеятельности;
+
+                Комментарий = commentLines.Length > 1 ? commentLines[1] : "";
+            }
+            else
+            {
+                Комментарий = application.Комментарий ?? "";
+            }
+        }
+    }
+
+    private async Task SaveChanges()
+    {
+        if (application != null)
+        {
+            if (!IdДеятельности.HasValue)
+            {
+                Message = "❗ Пожалуйста, выберите вид деятельности.";
+                return;
+            }
+
+            var selected = Activities.FirstOrDefault(a => a.IdДеятельности == IdДеятельности);
+            if (selected == null)
+            {
+                Message = "❗ Выбранный вид деятельности не найден.";
+                return;
+            }
+
+            if (UploadedFile != null)
+            {
+                application.ФотоОплаты = await UploadFile(UploadedFile);
+            }
+
+            application.Комментарий = $"Вид деятельности: {selected.Название}\n{Комментарий?.Trim()}";
+
+            Db.ЗаявкиНаАренду.Update(application);
+            await Db.SaveChangesAsync();
+            Message = "✅ Заявка обновлена";
+        }
+    }
+
+    private async Task GoBack()
+    {
+        await JSRuntime.InvokeVoidAsync("history.back");
+    }
+
+    private bool IsImage(string filePath)
+    {
+        var ext = Path.GetExtension(filePath)?.ToLowerInvariant();
+        return ext == ".jpg" || ext == ".jpeg" || ext == ".png" || ext == ".gif" || ext == ".bmp" || ext == ".webp";
+    }
+
+   
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        const long maxSize = 3 * 1024 * 1024;
+        var ext = Path.GetExtension(e.File.Name).ToLower();
+
+        var allowed = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".pdf", ".doc", ".docx" };
+
+        if (!allowed.Contains(ext))
+        {
+            Message = "❌ Неверный тип файла";
+            return;
+        }
+
+        if (e.File.Size > maxSize)
+        {
+            Message = $"❌ Файл слишком большой (максимум 3MB)";
+            return;
+        }
+
+        UploadedFile = e.File;
+    }
+
+    private async Task<string> UploadFile(IBrowserFile file)
+    {
+        var fileName = Path.GetRandomFileName() + Path.GetExtension(file.Name);
+        var folderPath = Path.Combine(Env.WebRootPath, "uploads");
+
+        if (!Directory.Exists(folderPath))
+            Directory.CreateDirectory(folderPath);
+
+        var filePath = Path.Combine(folderPath, fileName);
+
+        await using var stream = new FileStream(filePath, FileMode.Create);
+        await file.OpenReadStream(maxAllowedSize: 3 * 1024 * 1024).CopyToAsync(stream);
+
+        return "/uploads/" + fileName;
+    }
+}

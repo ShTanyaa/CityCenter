@@ -186,7 +186,7 @@
 <body class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
 <div class="submit-container">
     <div class="back-arrow" @onclick="GoBack">←</div>
-    <h2>Оплата аренды</h2>
+    <h2>Создание заявки</h2>
 
     @if (room == null)
     {
@@ -198,21 +198,23 @@
             <p><strong>Название:</strong> @room.Название</p>
             <p><strong>Этаж:</strong> @room.Этаж</p>
             <p><strong>Площадь:</strong> @room.Площадь м²</p>
-            <p><strong>Стоимость аренды:</strong> @room.СтоимостьАренды.ToString("C")</p>
+                <p><strong>Стоимость аренды:</strong> @room.СтоимостьАренды.ToString("N0") руб/мес</p>
         </div>
 
         <div class="card">
-            <InputFile OnChange="HandleFileUpload" accept="image/*" />
-            @if (!string.IsNullOrEmpty(ImagePreview))
-            {
-                <img src="@ImagePreview" class="preview" />
-            }
+                <InputFile OnChange="HandleFileUpload" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" />
+
+                @if (!string.IsNullOrEmpty(ImagePreview) && UploadedFile?.ContentType.StartsWith("image/") == true)
+                {
+                    <img src="@ImagePreview" class="preview" />
+                }
+
 
             <select class="form-control" @bind="IdДеятельности">
                 <option value="">-- Выберите вид деятельности --</option>
                 @foreach (var activity in Activities)
                 {
-                    <option value="@activity.IdНазначения">@activity.Название</option>
+                    <option value="@activity.IdДеятельности">@activity.Название</option>
                 }
             </select>
 
@@ -239,7 +241,7 @@
     private int? IdДеятельности;
     private DateTime ДатаНачала = DateTime.Today;
     private DateTime ДатаОкончания = DateTime.Today.AddMonths(1);
-    private List<НазначенияПомещений> Activities = new();
+    private List<ВидДеятельности> Activities = new();
 
     private Помещения? room;
     private IBrowserFile? UploadedFile;
@@ -250,18 +252,27 @@
     protected override async Task OnInitializedAsync()
     {
         room = await Db.Помещенияs.FindAsync(roomId);
-        Activities = await Db.НазначенияПомещенийs.ToListAsync();
+        Activities = await Db.ВидДеятельностиs.ToListAsync();
     }
 
     private async Task HandleFileUpload(InputFileChangeEventArgs e)
     {
         UploadedFile = e.File;
 
-        using var stream = UploadedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
-        var buffer = new byte[UploadedFile.Size];
-        await stream.ReadAsync(buffer);
-        ImagePreview = $"data:{UploadedFile.ContentType};base64,{Convert.ToBase64String(buffer)}";
+        // Если изображение — делаем превью
+        if (UploadedFile.ContentType.StartsWith("image/"))
+        {
+            using var stream = UploadedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+            var buffer = new byte[UploadedFile.Size];
+            await stream.ReadAsync(buffer);
+            ImagePreview = $"data:{UploadedFile.ContentType};base64,{Convert.ToBase64String(buffer)}";
+        }
+        else
+        {
+            ImagePreview = null;
+        }
     }
+
 
     private async Task SubmitApplication()
     {
@@ -290,7 +301,7 @@
             }
 
             // Получаем название выбранного вида деятельности
-            var selectedActivity = Activities.FirstOrDefault(a => a.IdНазначения == IdДеятельности);
+            var selectedActivity = Activities.FirstOrDefault(a => a.IdДеятельности == IdДеятельности);
             if (selectedActivity == null)
             {
                 Message = "❗ Выбранный вид деятельности не найден";
