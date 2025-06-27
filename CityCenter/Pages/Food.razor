@@ -7,7 +7,122 @@
 <!DOCTYPE html>
 <html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
 <head>
-<style>
+    <style>
+        .cafes-screen {
+            padding: 60px 30px;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a, #111);
+            color: white;
+            min-height: 100vh;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .cafes-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
+            width: 100%;
+            max-width: 1300px;
+        }
+
+        .cafes-title {
+            font-size: 3rem;
+            color: #ff6b6b;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
+            margin: 0 0 20px 0;
+            text-align: center;
+            width: 100%;
+        }
+
+        .floor-selector {
+            width: 250px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+            .floor-selector select {
+                width: 100%;
+                padding: 12px 16px;
+                font-size: 1rem;
+                border-radius: 8px;
+                border: none;
+                background-color: #2a2a2a;
+                color: white;
+                appearance: none;
+                cursor: pointer;
+                box-shadow: 0 0 10px rgba(0,0,0,0.3);
+                transition: all 0.3s ease;
+            }
+
+                .floor-selector select:hover {
+                    background-color: #333;
+                }
+
+                .floor-selector select:focus {
+                    outline: none;
+                    box-shadow: 0 0 0 2px #ff6b6b;
+                }
+
+            .floor-selector::after {
+                content: "▼";
+                position: absolute;
+                top: 50%;
+                right: 15px;
+                transform: translateY(-50%);
+                color: #ff6b6b;
+                pointer-events: none;
+            }
+
+        .cafes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding-bottom: 30px;
+        }
+
+        .cafe-card {
+            background: linear-gradient(135deg, #1b1b1b, #2a2a2a);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.6);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .cafe-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+            }
+
+        .cafe-card-img-container {
+            width: 100%;
+            height: 180px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .cafe-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .cafe-card:hover img {
+            transform: scale(1.05);
+        }
+
         .no-photo-placeholder {
             height: 100%;
             background: linear-gradient(135deg, #333, #444);
@@ -17,217 +132,201 @@
             color: #aaa;
             font-size: 1rem;
         }
-    .cafes-screen {
-        padding: 60px 30px;
-        font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #0a0a0a, #111);
-        color: white;
-        min-height: 100vh;
-        width: 100%;
-        box-sizing: border-box;
-        text-align: center;
-    }
 
-    .cafes-title {
-        font-size: 3rem;
-        text-align: center;
-        margin-bottom: 40px;
-        color: #ff6b6b;
-        text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
-    }
-
-    .cafes-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 30px;
-        max-width: 1300px;
-        margin: 0 auto;
-        padding-bottom: 60px;
-    }
-
-    .cafe-card {
-        background: linear-gradient(135deg, #1b1b1b, #2a2a2a);
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.6);
-        transition: all 0.3s ease;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-
-        .cafe-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+        .cafe-card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
-    .cafe-card-img-container {
-        width: 100%;
-        height: 180px;
-        border-radius: 12px;
-        overflow: hidden;
-        margin-bottom: 15px;
-        position: relative;
-    }
-
-    .cafe-card img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s ease;
-    }
-
-    .cafe-card:hover img {
-        transform: scale(1.05);
-    }
-
-    .no-photo-placeholder {
-        height: 100%;
-        background: linear-gradient(135deg, #333, #444);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #aaa;
-        font-size: 1rem;
-    }
-
-    .cafe-card-content {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .cafe-card h3 {
-        margin: 0 0 10px 0;
-        font-size: 1.4rem;
-        color: #fff;
-    }
-
-    .cafe-card p {
-        margin: 5px 0;
-        color: #ccc;
-        font-size: 0.95rem;
-    }
-
-    .cafe-card-link {
-        display: inline-block;
-        margin-top: auto;
-        padding: 10px 16px;
-        background-color: #ff6b6b;
-        color: white;
-        text-decoration: none;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        text-align: center;
-        font-weight: 500;
-    }
-
-        .cafe-card-link:hover {
-            background-color: #ff5252;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        .cafe-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.4rem;
+            color: #fff;
         }
 
-    .no-cafes-message {
-        font-size: 1.5rem;
-        color: #aaa;
-        margin-top: 50px;
-        padding: 30px;
-        background: rgba(40, 40, 40, 0.5);
-        border-radius: 16px;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-    }
+        .cafe-card p {
+            margin: 5px 0;
+            color: #ccc;
+            font-size: 0.95rem;
+        }
 
-    /* Для светлой темы */
-    .light-theme .cafes-screen {
-        background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
-    }
+        .cafe-card-link {
+            display: inline-block;
+            margin-top: auto;
+            padding: 10px 16px;
+            background-color: #ff6b6b;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+        }
 
-    .light-theme .cafe-card {
-        background: linear-gradient(135deg, #ffffff, #f5f5f5);
-        box-shadow: 0 0 15px rgba(0,0,0,0.1);
-    }
+            .cafe-card-link:hover {
+                background-color: #ff5252;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
 
-        .light-theme .cafe-card h3 {
+        .no-cafes-message {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: #aaa;
+            font-size: 1.2rem;
+        }
+
+        .floor-section {
+            margin-bottom: 40px;
+            width: 100%;
+        }
+
+        .floor-title {
+            font-size: 2rem;
+            margin: 30px 0 20px 0;
+            color: #ff6b6b;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ff6b6b;
+            text-align: center;
+        }
+
+        /* Для светлой темы */
+        .light-theme .cafes-screen {
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+        }
+
+        .light-theme .cafe-card {
+            background: linear-gradient(135deg, #ffffff, #f5f5f5);
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+            .light-theme .cafe-card h3 {
+                color: #333;
+            }
+
+            .light-theme .cafe-card p {
+                color: #666;
+            }
+
+        .light-theme .no-photo-placeholder {
+            background: linear-gradient(135deg, #e0e0e0, #f0f0f0);
+            color: #888;
+        }
+
+        .light-theme .floor-selector select {
+            background-color: #f5f5f5;
             color: #333;
         }
 
-        .light-theme .cafe-card p {
-            color: #666;
+            .light-theme .floor-selector select:hover {
+                background-color: #e0e0e0;
+            }
+
+        .light-theme .floor-title {
+            color: #e03131;
+            border-bottom-color: #e03131;
         }
-
-    .light-theme .no-photo-placeholder {
-        background: linear-gradient(135deg, #e0e0e0, #f0f0f0);
-        color: #888;
-    }
-
-    .light-theme .no-cafes-message {
-        color: #666;
-        background: rgba(220, 220, 220, 0.7);
-    }
-</style>
+    </style>
 </head>
 <body class="@(ThemeService.IsLightTheme ? "light-theme" : "")">
-<div class="cafes-screen">
-    <h1 class="cafes-title">Кафе и рестораны</h1>
+    <div class="cafes-screen">
+        <div class="cafes-header">
+            <h1 class="cafes-title">Кафе и рестораны</h1>
 
-    @if (Cafes.Any())
-    {
-        <div class="cafes-grid">
-            @foreach (var cafe in Cafes)
+            <div class="floor-selector">
+                <select @bind="SelectedFloor">
+                    <option value="0">Все этажи</option>
+                    @foreach (var floor in AvailableFloors.OrderBy(f => f))
+                    {
+                        <option value="@floor">@floor этаж</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        @if (FilteredCafes.Any())
+        {
+            @foreach (var floorGroup in FilteredCafes.GroupBy(c => c.Этаж).OrderBy(g => g.Key))
             {
-                <div class="cafe-card">
-                        <div class="shop-card-img-container">
-                            @if (!string.IsNullOrWhiteSpace(cafe.СсылкаНаМагазин))
-                            {
-                                var siteUrl = GetFullUrl(cafe.СсылкаНаМагазин);
-                                var faviconUrl = $"https://www.google.com/s2/favicons?sz=128&domain_url={siteUrl}";
-                                <img src="@faviconUrl"
-                                     alt="Логотип сайта"
-                                     onerror="this.onerror=null; this.src='/images/placeholder.png';" />
-                            }
-                            else
-                            {
-                                <div class="no-photo-placeholder">
-                                    Фото отсутствует
-                                </div>
-                            }
-                        </div>
-
-                    <div class="cafe-card-content">
-                        <h3>@cafe.Название</h3>
-                        <p><strong>Этаж:</strong> @cafe.Этаж</p>
-
-                        @if (!string.IsNullOrWhiteSpace(cafe.СсылкаНаМагазин))
+                <div class="floor-section">
+                    <h2 class="floor-title">@floorGroup.Key этаж</h2>
+                    <div class="cafes-grid">
+                        @foreach (var cafe in floorGroup.OrderBy(c => c.Название))
                         {
-                                <a href="@GetFullUrl(cafe.СсылкаНаМагазин)" target="_blank" class="cafe-card-link">
-                                🍽️ Посмотреть меню
-                            </a>
+                            <div class="cafe-card">
+                                <div class="cafe-card-img-container">
+                                    @if (!string.IsNullOrWhiteSpace(cafe.СсылкаНаМагазин))
+                                    {
+                                        var siteUrl = GetFullUrl(cafe.СсылкаНаМагазин);
+                                        var faviconUrl = $"https://www.google.com/s2/favicons?sz=128&domain_url={siteUrl}";
+                                        <img src="@faviconUrl"
+                                             alt="Логотип сайта"
+                                             onerror="this.onerror=null; this.src='/images/placeholder.png';" />
+                                    }
+                                    else if (!string.IsNullOrWhiteSpace(cafe.Фото))
+                                    {
+                                        <img src="@cafe.Фото" alt="Фото кафе" />
+                                    }
+                                    else
+                                    {
+                                        <div class="no-photo-placeholder">
+                                            Фото отсутствует
+                                        </div>
+                                    }
+                                </div>
+
+                                <div class="cafe-card-content">
+                                    <h3>@cafe.Название</h3>
+                                    <p><strong>Этаж:</strong> @cafe.Этаж</p>
+
+                                    @if (!string.IsNullOrWhiteSpace(cafe.СсылкаНаМагазин))
+                                    {
+                                        <a href="@GetFullUrl(cafe.СсылкаНаМагазин)" target="_blank" class="cafe-card-link">
+                                            🍽️ Посмотреть меню
+                                        </a>
+                                    }
+                                </div>
+                            </div>
                         }
                     </div>
                 </div>
             }
-        </div>
-    }
-    else
-    {
-        <div class="no-cafes-message">
-            <p>Скоро тут будут кафе и рестораны!</p>
-            <p>Мы работаем над этим</p>
-        </div>
-    }
-</div>
+        }
+        else
+        {
+            <div class="no-cafes-message">
+                На выбранном этаже нет кафе и ресторанов
+            </div>
+        }
+    </div>
 </body>
 </html>
+
 @code {
     private List<CafeInfo> Cafes = new();
+    private List<CafeInfo> FilteredCafes = new();
+    private List<int> AvailableFloors = new();
+    private int selectedFloor = 0;
+
+    private int SelectedFloor
+    {
+        get => selectedFloor;
+        set
+        {
+            if (selectedFloor != value)
+            {
+                selectedFloor = value;
+                FilterCafes();
+            }
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
         Cafes = await Db.Помещенияs
-            .Where(p => p.IdНазначения == 2) // ID 10 - кафе и рестораны
+            .Where(p => p.IdНазначения == 2) // ID 2 - кафе и рестораны
             .Select(p => new CafeInfo
                 {
                     Название = p.Название,
@@ -236,6 +335,20 @@
                     СсылкаНаМагазин = p.СсылкаНаМагазин
                 })
             .ToListAsync();
+
+        AvailableFloors = Cafes
+            .Select(c => c.Этаж)
+            .Distinct()
+            .ToList();
+
+        FilteredCafes = Cafes;
+    }
+
+    private void FilterCafes()
+    {
+        FilteredCafes = SelectedFloor == 0
+            ? Cafes
+            : Cafes.Where(c => c.Этаж == SelectedFloor).ToList();
     }
 
     private string GetFullUrl(string? url)

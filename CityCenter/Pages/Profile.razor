@@ -10,6 +10,26 @@
 <html lang="ru" class="@(ThemeService.IsLightTheme ? "light-theme" : "dark-theme")">
 <head>
     <style>
+
+        .form-control {
+            padding: 12px;
+            font-size: 1.4rem;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 600px;
+            background-color: #fff;
+            color: #333;
+            transition: box-shadow 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+            .form-control:focus {
+                outline: none;
+                box-shadow: 0 0 10px rgba(0, 120, 215, 0.5);
+                border-color: #0078d7;
+            }
         /* Основные стили (светлая тема по умолчанию) */
         body {
             font-family: 'Poppins', sans-serif;
@@ -264,8 +284,9 @@
 
         @if (activeTab == "rented")
         {
+            <input type="text" class="form-control" placeholder="Поиск по помещениям..." @bind="searchTerm" />
             <div class="grid">
-                @foreach (var room in RentedRooms)
+                @foreach (var room in FilteredRooms)
                 {
                     <div class="card">
                         @if (!string.IsNullOrWhiteSpace(room.Фото))
@@ -458,6 +479,16 @@
         currentImageUrl = imageUrl;
         showFullImage = true;
     }
+    private string? searchTerm;
+
+    private IEnumerable<RoomModel> FilteredRooms =>
+
+        string.IsNullOrWhiteSpace(searchTerm)
+
+          ? RentedRooms
+
+          : RentedRooms.Where(r => r.Название.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+
 
     private void CloseFullImage()
     {
